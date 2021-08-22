@@ -29,13 +29,14 @@ with pure CSS.
 Consume data from an API through a Back-End server developed in NodeJS using
 Express.
 Data stored in a relational database using PostgreSQL.</p>
-  <!--<ul>
+<br>
+<ul>
     <li>Filter pokemons by type</li>
     <li>Order the pokemons by: alphabetical order, strenght, all in a descendent or ascendent way</li>
     <li>Search the pokemon by name</li>
     <li>Create your own personal pokemon!</li>
     <li>See the details of each pokemon, such as type and stats</li>
-   </ul>-->
+</ul>
 <h3 align="center"><a href="https://ivan-pokemon-app-ivanox97.vercel.app/" target="_blank">SEE IT HERE</a><h3>
  
 
