@@ -1,4 +1,4 @@
-<h1 align="center">Hi 👋, I'm Sofía</h1>
+<h1 align="center">Hi 👋, I'm Ivan</h1>
 <h3 align="center">Full Stack Developer 🚀 from Argentina to 🌎</h3>
 
 - 📫 How to reach me **arevaloivan1997@gmail.com**
