@@ -38,6 +38,8 @@ Data stored in a relational database using PostgreSQL.</p>
     <li>See the details of each pokemon, such as type and stats</li>
 </ul>
 <h3 align="center"><a href="https://ivan-pokemon-app-ivanox97.vercel.app/" target="_blank">SEE IT HERE</a><h3>
- 
+  
+<img src="https://user-images.githubusercontent.com/82329197/130340303-f287603f-e270-4808-a4fe-f452efaa9cc3.png?raw=true"/>
+<img src="https://user-images.githubusercontent.com/82329197/130340306-88854652-bbf9-4398-a085-888b999f63a6.png?raw=true"/>
 
  <h5 align="center"><a href="https://github.com/ivanox97/PI-Pokemon-FT14a" target="_blank">repository</a></h5>
