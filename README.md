@@ -1,7 +1,7 @@
 <h1 align="center">Hi 👋, I'm Ivan</h1>
 <h3 align="center">Full Stack Developer 🚀 from Argentina to 🌎</h3>
 
-<img src="https://user-images.githubusercontent.com/82329197/130340385-fe1a2e16-86bc-48d8-9923-04a3e0088e0c.png" height="90px"/>
+<img src="https://user-images.githubusercontent.com/82329197/130340385-fe1a2e16-86bc-48d8-9923-04a3e0088e0c.png?raw=true"/>
 
 
 - 📫 How to reach me **arevaloivan1997@gmail.com**
