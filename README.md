@@ -29,11 +29,7 @@
 </p>
 
 <h3 align="left">Check out my work:</h3>
-<p align="left">Develop a SPA using ReactJS for Front-End, Redux for state management and styles
-with pure CSS.
-Consume data from an API through a Back-End server developed in NodeJS using
-Express.
-Data stored in a relational database using PostgreSQL.</p>
+<p align="left">I recently develop a SPA using ReactJS for Front-End, Redux for state management and styles with Styled Components. This one also consume data from an API through a Back-End server developed in NodeJS using Express and stores data in a relational database using PostgreSQL.</p>
 <br>
 <ul>
     <li>Filter pokemons by type</li>
