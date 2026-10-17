@@ -182,12 +182,12 @@ pre.code:not([hidden]){animation:fadeIn .25s ease}
 /* ---------- Ficha de capa ---------- */
 .reader{min-width:0}
 .sheet{background:var(--surface); border:1px solid var(--line); border-top:4px solid var(--accent); padding:1.5rem clamp(1rem,2.6vw,2rem) 2rem; scroll-margin-top:1rem; min-width:0}
-.sheet[data-layer="dominio"]{--accent:var(--domain); --accent-soft:var(--domain-soft); --anno:var(--domain-c)}
-.sheet[data-layer="aplicacion"]{--accent:var(--app); --accent-soft:var(--app-soft); --anno:var(--app-c)}
-.sheet[data-layer="puertos-entrada"],.sheet[data-layer="puertos-salida"]{--accent:var(--port); --accent-soft:var(--port-soft); --anno:var(--port-c)}
-.sheet[data-layer="adaptadores-entrada"]{--accent:var(--in); --accent-soft:var(--in-soft); --anno:var(--in-c)}
-.sheet[data-layer="adaptadores-salida"]{--accent:var(--out); --accent-soft:var(--out-soft); --anno:var(--out-c)}
-.sheet[data-layer="configuracion"],.sheet.flow{--accent:var(--cfg); --accent-soft:var(--cfg-soft); --anno:var(--cfg-c)}
+.sheet[data-layer="dominio"],.dlg[data-layer="dominio"]{--accent:var(--domain); --accent-soft:var(--domain-soft); --anno:var(--domain-c)}
+.sheet[data-layer="aplicacion"],.dlg[data-layer="aplicacion"]{--accent:var(--app); --accent-soft:var(--app-soft); --anno:var(--app-c)}
+.sheet[data-layer="puertos-entrada"],.sheet[data-layer="puertos-salida"],.dlg[data-layer="puertos-entrada"],.dlg[data-layer="puertos-salida"]{--accent:var(--port); --accent-soft:var(--port-soft); --anno:var(--port-c)}
+.sheet[data-layer="adaptadores-entrada"],.dlg[data-layer="adaptadores-entrada"]{--accent:var(--in); --accent-soft:var(--in-soft); --anno:var(--in-c)}
+.sheet[data-layer="adaptadores-salida"],.dlg[data-layer="adaptadores-salida"]{--accent:var(--out); --accent-soft:var(--out-soft); --anno:var(--out-c)}
+.sheet[data-layer="configuracion"],.dlg[data-layer="configuracion"],.sheet.flow{--accent:var(--cfg); --accent-soft:var(--cfg-soft); --anno:var(--cfg-c)}
 .sheet > * + *{margin-top:1.15rem}
 .eyebrow{display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin:0}
 .eyebrow svg{width:.9rem; height:.9rem}
@@ -308,6 +308,44 @@ td.y{color:var(--good); font-weight:600} td.n{color:var(--bad); font-weight:600}
 .sources{margin-top:4rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.9rem; color:var(--ink-2)}
 .sources h2{font-family:var(--display); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin:0 0 .6rem; color:var(--ink-3)}
 .sources ul{margin:0; padding-left:1.1rem; display:grid; gap:.3rem}
+
+/* ---------- Guía de la columna derecha ---------- */
+.sheet.guide{--accent:var(--ink); --accent-soft:var(--surface-2)}
+.guide-list{list-style:none; padding:0 !important; margin:0; border-top:1px solid var(--line-2); max-width:none !important}
+.guide-list li{margin:0 !important; border-bottom:1px solid var(--line-2)}
+.guide-list button{all:unset; box-sizing:border-box; width:100%; display:grid; grid-template-columns:1rem minmax(0,1fr) auto; gap:.1rem .75rem; align-items:baseline; padding:.7rem .4rem; cursor:pointer}
+.guide-list button svg{width:.9rem; height:.9rem; grid-row:1 / span 2; align-self:start; margin-top:.3rem}
+.guide-list button svg path{fill:var(--sw)}
+.g-name{font-family:var(--display); font-weight:700; font-size:1.02rem; color:var(--ink)}
+.g-desc{grid-column:2; font-size:.93rem; color:var(--ink-2); line-height:1.45}
+.g-go{grid-column:3; grid-row:1 / span 2; align-self:center; font-family:var(--mono); color:var(--ink-3); transition:transform .2s ease, color .2s ease}
+.guide-list button:hover, .guide-list button:focus-visible{background:var(--surface-2)}
+.guide-list button:hover .g-go, .guide-list button:focus-visible .g-go{transform:translateX(4px); color:var(--sw)}
+.guide-list button:focus-visible{outline:2px solid var(--in); outline-offset:-2px}
+
+/* ---------- Ventana emergente con la explicación de cada capa ---------- */
+html:has(.dlg[open]), body:has(.dlg[open]){overflow:hidden}
+.dlg{width:min(940px, calc(100vw - 24px)); max-width:none; max-height:calc(100dvh - 24px); padding:0; border:1px solid var(--line); background:var(--surface); color:var(--ink); overflow:hidden}
+.dlg[open]{display:flex; flex-direction:column; animation:dlgIn .3s cubic-bezier(.2,.8,.2,1)}
+.dlg::backdrop{background:rgb(8 11 13 / .58)}
+.dlg[open]::backdrop{animation:fadeIn .3s ease}
+@keyframes dlgIn{from{opacity:0; transform:translateY(16px) scale(.98)} to{opacity:1; transform:none}}
+.dlg-bar{display:flex; align-items:center; gap:.5rem; padding:.5rem .6rem .5rem 1rem; border-top:4px solid var(--accent, var(--ink)); border-bottom:1px solid var(--line); background:var(--surface); flex:none}
+.dlg-sw{width:.9rem; height:.9rem; flex:none}
+.dlg-sw path{fill:var(--accent, var(--ink))}
+.dlg-name{font-family:var(--display); font-weight:750; font-size:.95rem; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.dlg-pos{font-family:var(--mono); font-size:.72rem; color:var(--ink-3); font-variant-numeric:tabular-nums; flex:none}
+.dlg-spacer{flex:1}
+.dlg-btn{font-family:var(--display); font-weight:650; font-size:.88rem; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:.4rem .7rem; border-radius:2px; cursor:pointer; flex:none}
+.dlg-btn:hover{border-color:var(--ink-3)}
+.dlg-close{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.dlg-body{overflow-y:auto; overscroll-behavior:contain; flex:1 1 auto; min-height:0}
+.dlg .sheet{border:0; padding-top:1.3rem}
+@media (max-width:640px){
+  .dlg{width:100%; height:100%; max-height:100%; margin:0; border:0}
+  .dlg-bar{padding-top:max(.5rem, env(safe-area-inset-top, 0px)); padding-left:max(1rem, env(safe-area-inset-left, 0px)); padding-right:max(.6rem, env(safe-area-inset-right, 0px))}
+  .dlg-pos{display:none}
+}
 .stereo{margin-top:2.2rem}
 .stereo h3{font-family:var(--display); font-weight:800; font-size:1.35rem; margin:0 0 .7rem}
 .stereo p{margin:0 0 .8rem; max-width:68ch}
@@ -528,6 +566,569 @@ td.y{color:var(--good); font-weight:600} td.n{color:var(--bad); font-weight:600}
 
     <div class="reader">
 
+      <!-- ================= GUÍA ================= -->
+      <article class="sheet guide" id="ficha-guia" aria-labelledby="h-guia">
+        <p class="eyebrow"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg>Cómo usarlo</p>
+        <h2 id="h-guia">Tocá una pieza del hexágono</h2>
+        <p class="lead">Cada parte abre una ventana con qué es, por qué existe, qué componentes de Spring usa y su código Java. También podés elegirla de esta lista.</p>
+        <ul class="guide-list">
+          <li><button type="button" data-pick="dominio" style="--sw:var(--domain)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Dominio</span><span class="g-desc">Las reglas del negocio en Java puro. No conoce a nadie.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="aplicacion" style="--sw:var(--app)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Aplicación</span><span class="g-desc">Los casos de uso: orquestan al dominio a través de los puertos.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="puertos-entrada" style="--sw:var(--port)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Puertos de entrada</span><span class="g-desc">Interfaces con lo que la aplicación ofrece.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="puertos-salida" style="--sw:var(--port)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Puertos de salida</span><span class="g-desc">Interfaces con lo que la aplicación necesita de afuera.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="adaptadores-entrada" style="--sw:var(--in)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Adaptadores de entrada</span><span class="g-desc">REST, Kafka y jobs que convierten un pedido externo en un caso de uso.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="adaptadores-salida" style="--sw:var(--out)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Adaptadores de salida</span><span class="g-desc">JPA, JdbcClient, RestClient y Kafka detrás de los puertos.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+          <li><button type="button" data-pick="configuracion" style="--sw:var(--cfg)"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg><span class="g-name">Configuración</span><span class="g-desc">Spring Boot conecta cada puerto con su adaptador.</span><span class="g-go" aria-hidden="true">→</span></button></li>
+        </ul>
+        <p class="note">Para verlo en movimiento, tocá <b>Seguir un POST /api/orders</b> y mirá cómo un pedido cruza todas las capas.</p>
+      </article>
+
+      <!-- ================= RECORRIDO ================= -->
+      <article class="sheet flow" id="ficha-recorrido" aria-labelledby="h-flow" hidden>
+        <p class="eyebrow"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg>Recorrido</p>
+        <h2 id="h-flow">Un POST /api/orders, de punta a punta</h2>
+        <p class="lead">Seguí el punto en el diagrama. Fijate cuántas veces la petición entra al dominio y cuántas sale por un puerto: el núcleo nunca llama directo a la base ni a una API.</p>
+
+        <ol class="flow-steps">
+          <li class="step" data-via="" data-x="24" data-y="232" data-targets="a-rest">
+            <button type="button"><span class="n">01</span><span>El cliente envía el pedido<span class="where">Afuera del hexágono</span></span></button>
+            <div class="detail"><p><code>POST /api/orders</code> con un JWT en el header y <code>{"items":[{"productId":"…","quantity":2}],"paymentToken":"tok_…"}</code>.</p></div>
+          </li>
+          <li class="step" data-via="" data-x="128" data-y="258" data-targets="a-rest">
+            <button type="button"><span class="n">02</span><span>OrderController traduce HTTP a negocio<span class="where">Adaptador de entrada</span></span></button>
+            <div class="detail"><p>Spring deserializa el JSON en <code>PlaceOrderRequest</code> y <code>@Valid</code> corta los errores de formato con 400. El id del cliente sale del token. Resultado: un <code>PlaceOrderCommand</code>.</p></div>
+          </li>
+          <li class="step" data-via="216,228" data-x="266" data-y="228" data-targets="a-rest p-place">
+            <button type="button"><span class="n">03</span><span>Cruza el puerto de entrada<span class="where">PlaceOrderUseCase</span></span></button>
+            <div class="detail"><p>El controller llama a <code>placeOrder.place(command)</code>. Solo conoce la interfaz: no sabe qué clase la implementa ni que hay una transacción alrededor.</p></div>
+          </li>
+          <li class="step" data-via="330,228 420,175" data-x="500" data-y="174" data-targets="app">
+            <button type="button"><span class="n">04</span><span>PlaceOrderService toma el control<span class="where">Aplicación</span></span></button>
+            <div class="detail"><p>La lambda de <code>BeanConfiguration</code> abre la transacción y delega en el servicio, que ejecuta el caso de uso paso a paso.</p></div>
+          </li>
+          <li class="step" data-via="640,170 700,250 733,292" data-x="764" data-y="292" data-targets="app p-catalog a-db">
+            <button type="button"><span class="n">05</span><span>Busca precios en la base<span class="where">ProductCatalog → JdbcClient</span></span></button>
+            <div class="detail"><p><code>catalog.priceOf(id)</code> sale por el puerto y llega a <code>ProductCatalogAdapter</code>, que ejecuta <code>select price, currency from products …</code>. El precio nunca viene del cliente.</p></div>
+          </li>
+          <li class="step" data-via="620,310" data-x="500" data-y="322" data-targets="dom">
+            <button type="button"><span class="n">06</span><span>El dominio crea el pedido<span class="where">Order.place(…)</span></span></button>
+            <div class="detail"><p>Valida las invariantes (al menos una línea, una sola moneda) y calcula el total con <code>Money</code>. Si algo no cumple, lanza una excepción de negocio que termina en un 422.</p></div>
+          </li>
+          <li class="step" data-via="620,340 733,356" data-x="764" data-y="356" data-targets="app p-pay a-pay">
+            <button type="button"><span class="n">07</span><span>Cobra en la API externa<span class="where">PaymentGateway → RestClient</span></span></button>
+            <div class="detail"><p><code>PaymentApiAdapter</code> hace <code>POST /v1/charges</code> con <code>Idempotency-Key</code> igual al id del pedido y timeouts de 2 y 5 segundos. La respuesta del proveedor vuelve como <code>PaymentResult</code>.</p></div>
+          </li>
+          <li class="step" data-via="733,356 620,340" data-x="500" data-y="322" data-targets="dom">
+            <button type="button"><span class="n">08</span><span>El pedido pasa a pagado<span class="where">order.markAsPaid(…)</span></span></button>
+            <div class="detail"><p>El agregado verifica que estaba en <code>PENDING_PAYMENT</code> y pasa a <code>PAID</code>. Si el pago quedó pendiente, el pedido sigue así y lo resuelve el job de vencidos.</p></div>
+          </li>
+          <li class="step" data-via="600,270 733,228" data-x="764" data-y="228" data-targets="app p-repo a-db">
+            <button type="button"><span class="n">09</span><span>Se guarda en PostgreSQL<span class="where">OrderRepository → Spring Data JPA</span></span></button>
+            <div class="detail"><p><code>OrderPersistenceAdapter</code> mapea a <code>OrderJpaEntity</code> y Spring Data hace los <code>INSERT</code> en <code>orders</code> y <code>order_lines</code>. El commit llega al terminar el caso de uso.</p></div>
+          </li>
+          <li class="step" data-via="733,228 660,320 733,420" data-x="764" data-y="420" data-targets="app p-events a-kafka-out">
+            <button type="button"><span class="n">10</span><span>Se publica el evento<span class="where">OrderEventPublisher → Kafka</span></span></button>
+            <div class="detail"><p><code>KafkaOrderPublisher</code> envía el mensaje a <code>orders.order-placed.v1</code> con el id del pedido como clave. Logística, mails y analytics se enteran sin que este servicio los conozca.</p></div>
+          </li>
+          <li class="step" data-via="733,420 600,480 400,480 300,330 266,228 216,228 128,258" data-x="24" data-y="232" data-targets="a-rest">
+            <button type="button"><span class="n">11</span><span>Respuesta 201 Created<span class="where">De vuelta por el adaptador de entrada</span></span></button>
+            <div class="detail"><p>El caso de uso devuelve el <code>OrderId</code> y el controller arma <code>Location: /api/orders/{id}</code>. Si el pago se rechazó, <code>ApiExceptionHandler</code> responde 402 con un <code>ProblemDetail</code>.</p></div>
+          </li>
+        </ol>
+
+        <div class="flow-nav">
+          <button type="button" class="btn" id="flow-play" aria-pressed="false">Reproducir</button>
+          <button type="button" class="btn" id="flow-prev">Anterior</button>
+          <button type="button" class="btn primary" id="flow-next">Siguiente paso</button>
+          <output id="flow-count" aria-live="polite">Paso 1 de 11</output>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= REGLA DE DEPENDENCIAS ================= -->
+  <section class="band" id="paquetes" aria-labelledby="h-paquetes">
+    <header>
+      <h2 id="h-paquetes"><span class="num">La regla</span>Todas las dependencias apuntan hacia adentro</h2>
+      <p>Se verifica mirando los imports. Un archivo del dominio no importa nada de afuera; un adaptador puede importar puertos y dominio, pero nunca otro adaptador. La estructura de paquetes hace visible la regla, y un test de ArchUnit (en la sección de tests) la hace obligatoria.</p>
+    </header>
+    <div class="split">
+      <pre class="tree" aria-label="Estructura de paquetes del proyecto"><b class="k">com.shop.orders</b>
+├── <b class="d">domain</b>                      <span class="d">Java puro, sin imports de frameworks</span>
+│   ├── model                   Order, OrderLine, Money, OrderId, OrderStatus
+│   ├── event                   OrderPlaced
+│   └── exception               InvalidOrderStateException, EmptyOrderException, …
+├── <b class="a">application</b>
+│   ├── <b class="p">port</b>
+│   │   ├── <b class="p">in</b>                  PlaceOrderUseCase, GetOrderQuery, MarkShippedUseCase, …
+│   │   └── <b class="p">out</b>                 OrderRepository, ProductCatalog, PaymentGateway, …
+│   └── service                 PlaceOrderService, GetOrderService, …
+├── <b class="i">adapter</b>
+│   ├── <b class="i">in</b>
+│   │   ├── web                 OrderController, PlaceOrderRequest, ApiExceptionHandler
+│   │   ├── messaging           ShipmentListener
+│   │   └── scheduling          ExpiredOrdersJob
+│   └── <b class="o">out</b>
+│       ├── persistence         OrderPersistenceAdapter, OrderJpaEntity, ProductCatalogAdapter
+│       ├── payment             PaymentApiAdapter, PaymentApiProperties
+│       └── messaging           KafkaOrderPublisher
+├── <b class="c">config</b>                      BeanConfiguration, KafkaConfig
+└── OrdersApplication.java</pre>
+
+      <div>
+        <div class="table-wrap">
+          <table class="matrix">
+            <caption class="small" style="caption-side:bottom; text-align:left; padding:.6rem .8rem">Fila = quién importa. Columna = a quién.</caption>
+            <thead><tr><th scope="col">Paquete</th><th scope="col">domain</th><th scope="col">application</th><th scope="col">adapter</th><th scope="col">Spring y librerías</th></tr></thead>
+            <tbody>
+              <tr><td><span class="sw" style="background:var(--domain)"></span>domain</td><td class="y">sí</td><td class="n">no</td><td class="n">no</td><td class="n">no</td></tr>
+              <tr><td><span class="sw" style="background:var(--app)"></span>application</td><td class="y">sí</td><td class="y">sí</td><td class="n">no</td><td class="m">opcional*</td></tr>
+              <tr><td><span class="sw" style="background:var(--in)"></span>adapter</td><td class="y">sí</td><td class="m">solo puertos</td><td class="n">no entre sí</td><td class="y">sí</td></tr>
+              <tr><td><span class="sw" style="background:var(--cfg)"></span>config</td><td class="y">sí</td><td class="y">sí</td><td class="y">sí</td><td class="y">sí</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small">* <code>@Service</code> y <code>@Transactional</code> en la variante pragmática. En la estricta, la aplicación tampoco importa Spring.</p>
+        <p class="small">Una alternativa común es poner los puertos de salida dentro de <code>domain</code> (por ejemplo, <code>domain.repository</code>). Funciona igual: lo que no se negocia es la dirección de las flechas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SPRING POR CAPA ================= -->
+  <section class="band" id="spring" aria-labelledby="h-spring">
+    <header>
+      <h2 id="h-spring"><span class="num">Mapa</span>Spring, capa por capa</h2>
+      <p>Una forma rápida de revisar un proyecto: buscá cada anotación y fijate en qué paquete está. Si una de la columna «adaptador» aparece en <code>domain</code>, ahí hay una dependencia que apunta para el lado equivocado.</p>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Componente</th><th scope="col">Capa</th><th scope="col">Para qué se usa acá</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>@RestController</code>, <code>@Valid</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Exponer casos de uso por HTTP y validar el formato del JSON.</td></tr>
+          <tr><th scope="row"><code>@RestControllerAdvice</code>, <code>ProblemDetail</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Traducir excepciones de negocio a códigos HTTP.</td></tr>
+          <tr><th scope="row"><code>@KafkaListener</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cuando llega un mensaje.</td></tr>
+          <tr><th scope="row"><code>@Scheduled</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cada cierto tiempo.</td></tr>
+          <tr><th scope="row"><code>@Component</code></th><td><span class="sw" style="background:var(--in)"></span><span class="sw" style="background:var(--out)"></span>Adaptadores (los dos lados)</td><td>Registrar como bean listeners, jobs, clientes HTTP, publishers y mappers.</td></tr>
+          <tr><th scope="row"><code>@Service</code>, <code>@Transactional</code></th><td><span class="sw" style="background:var(--app)"></span>Aplicación (opcional)</td><td>Registrar el servicio y marcar el límite de la transacción.</td></tr>
+          <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--port)"></span>Puertos</td><td>Interfaces Java planas.</td></tr>
+          <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--domain)"></span>Dominio</td><td>Java puro.</td></tr>
+          <tr><th scope="row"><code>@Entity</code>, <code>JpaRepository</code>, <code>@Repository</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Persistir en una base relacional.</td></tr>
+          <tr><th scope="row"><code>JdbcClient</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Consultas SQL explícitas.</td></tr>
+          <tr><th scope="row"><code>RestClient</code>, <code>@HttpExchange</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Llamar a APIs de otros sistemas.</td></tr>
+          <tr><th scope="row"><code>KafkaTemplate</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Publicar eventos.</td></tr>
+          <tr><th scope="row"><code>@Configuration</code>, <code>@Bean</code>, <code>@Profile</code></th><td><span class="sw" style="background:var(--cfg)"></span>Configuración</td><td>Conectar puertos con sus implementaciones.</td></tr>
+          <tr><th scope="row"><code>@ConfigurationProperties</code></th><td><span class="sw" style="background:var(--cfg)"></span>Config. / adaptadores</td><td>Valores por ambiente, tipados.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="split stereo" id="component">
+      <div>
+        <h3>¿Y @Component?</h3>
+        <p><code>@Component</code> es el estereotipo genérico: le dice al component scan «registrá esta clase como bean». <code>@Service</code>, <code>@Repository</code> y <code>@Controller</code> son <code>@Component</code> con otro nombre (están meta-anotadas con él), así que se detectan igual. Solo dos agregan comportamiento:</p>
+        <ul>
+          <li><code>@Repository</code> traduce las excepciones de la base a <code>DataAccessException</code>.</li>
+          <li><code>@Controller</code> y <code>@RestController</code> son los que Spring MVC registra como handlers HTTP.</li>
+          <li><code>@Service</code> no agrega nada: solo comunica «acá hay lógica de aplicación».</li>
+          <li><code>@Component</code> cubre todo lo demás.</li>
+        </ul>
+        <p>En hexagonal, <code>@Component</code> va en los adaptadores que no son ni controllers ni repositorios. En esta página son <code>ShipmentListener</code>, <code>ExpiredOrdersJob</code>, <code>PaymentApiAdapter</code>, <code>KafkaOrderPublisher</code>, <code>ProductCatalogAdapter</code> y <code>OrderJpaMapper</code>. Ponerles <code>@Service</code> confundiría, porque no tienen lógica de negocio. Nunca va en el dominio, y tampoco en un puerto: el puerto es una interfaz y lo que se anota es la clase que lo implementa.</p>
+        <p>Algunos equipos crean estereotipos propios meta-anotados con <code>@Component</code>, como <code>@Adapter</code> o <code>@UseCase</code>. El código se lee mejor y ArchUnit puede exigir, por ejemplo, que toda clase de <code>adapter</code> lleve <code>@Adapter</code>. Tené en cuenta dos cosas. La clase sigue dependiendo de Spring, aunque sea a través de tu anotación. Y <code>@UseCase</code> solo sirve en la variante pragmática: en la estricta los servicios ya se declaran en <code>BeanConfiguration</code> y terminarías con dos beans.</p>
+      </div>
+      <div class="codeset">
+<script type="text/plain" data-file="Adapter.java">
+package com.shop.orders.shared;
+
+/** Estereotipo propio: se comporta como @Component y dice qué rol cumple la clase. */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Adapter {
+
+    @AliasFor(annotation = Component.class)
+    String value() default "";
+}
+</script>
+<script type="text/plain" data-file="UseCase.java">
+package com.shop.orders.shared;
+
+/** Solo para la variante pragmática (sin BeanConfiguration para los servicios). */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface UseCase {
+
+    @AliasFor(annotation = Component.class)
+    String value() default "";
+}
+</script>
+<script type="text/plain" data-file="Uso">
+@Adapter                       // en lugar de @Component
+class PaymentApiAdapter implements PaymentGateway { ... }
+
+@Adapter
+class KafkaOrderPublisher implements OrderEventPublisher { ... }
+
+@UseCase                       // en lugar de @Service
+@Transactional
+public class PlaceOrderService implements PlaceOrderUseCase { ... }
+
+// Y la regla en ArchUnit:
+@ArchTest
+static final ArchRule adapters_are_marked = classes()
+        .that().resideInAPackage("..adapter..")
+        .and().haveSimpleNameEndingWith("Adapter")
+        .should().beAnnotatedWith(Adapter.class)
+        .orShould().beAnnotatedWith(Repository.class);
+</script>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TESTS ================= -->
+  <section class="band" id="tests" aria-labelledby="h-tests">
+    <header>
+      <h2 id="h-tests"><span class="num">Tests</span>Cada capa se prueba con lo mínimo que necesita</h2>
+      <p>Este es el beneficio más concreto del día a día. Como el núcleo no depende de nada, la mayoría de los tests corre sin Spring y sin base. Los tests lentos quedan solo en los adaptadores, que es donde de verdad hay infraestructura.</p>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Qué</th><th scope="col">Qué se prueba</th><th scope="col">Herramienta</th><th scope="col">¿Levanta Spring?</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="sw" style="background:var(--domain)"></span>Dominio</th><td>Invariantes, cálculos, transiciones de estado</td><td>JUnit 5 + AssertJ</td><td class="y">No</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--app)"></span>Aplicación</th><td>Orquestación y decisiones del caso de uso</td><td>JUnit + fakes en memoria (o Mockito)</td><td class="y">No</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--in)"></span>Adaptador web</th><td>JSON, validación, status, seguridad</td><td><code>@WebMvcTest</code> + MockMvc + <code>@MockitoBean</code></td><td class="m">Solo la capa web</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>Persistencia</th><td>Mapeo, queries, migraciones</td><td><code>@DataJpaTest</code> + Testcontainers</td><td class="m">Solo JPA</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>API externa</th><td>Request, respuestas, errores, timeouts</td><td>WireMock</td><td class="y">No</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--cfg)"></span>Arquitectura</th><td>Que nadie rompa la regla de dependencias</td><td>ArchUnit</td><td class="y">No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tests-codes">
+      <div class="codeset">
+<script type="text/plain" data-file="OrderTest.java">
+class OrderTest {
+
+    static final Instant NOW = Instant.parse("2026-03-02T15:00:00Z");
+    static final CustomerId CUSTOMER = new CustomerId("cust-42");
+
+    @Test
+    void total_is_the_sum_of_the_lines() {
+        Order order = Order.place(CUSTOMER, List.of(line("1500.00", 2), line("250.50", 1)), NOW);
+
+        assertThat(order.total()).isEqualTo(Money.of("3250.50", "ARS"));
+    }
+
+    @Test
+    void a_cancelled_order_cannot_be_paid() {
+        Order order = Order.place(CUSTOMER, List.of(line("100", 1)), NOW);
+        order.cancel();
+
+        assertThatThrownBy(() -> order.markAsPaid(new PaymentId("pay_1")))
+                .isInstanceOf(InvalidOrderStateException.class);
+    }
+
+    @Test
+    void an_order_without_lines_is_rejected() {
+        assertThatThrownBy(() -> Order.place(CUSTOMER, List.of(), NOW))
+                .isInstanceOf(EmptyOrderException.class);
+    }
+
+    private static OrderLine line(String price, int quantity) {
+        return new OrderLine(new ProductId(UUID.randomUUID()), quantity, Money.of(price, "ARS"));
+    }
+}
+</script>
+<script type="text/plain" data-file="PlaceOrderServiceTest.java">
+/** Sin Spring y sin Mockito: los puertos se implementan con un HashMap y lambdas. */
+class PlaceOrderServiceTest {
+
+    static final Instant NOW = Instant.parse("2026-03-02T15:00:00Z");
+
+    InMemoryOrderRepository orders = new InMemoryOrderRepository();
+    List<OrderPlaced> published = new ArrayList<>();
+    ProductCatalog catalog = productId -> Money.of("1500.00", "ARS");
+
+    PlaceOrderService serviceWith(PaymentGateway payments) {
+        return new PlaceOrderService(catalog, payments, orders, published::add,
+                                     Clock.fixed(NOW, ZoneOffset.UTC));
+    }
+
+    @Test
+    void approved_payment_leaves_the_order_paid_and_publishes_the_event() {
+        var service = serviceWith((orderId, amount, token) ->
+                PaymentResult.approved(new PaymentId("pay_1")));
+
+        OrderId id = service.place(command(2));
+
+        Order saved = orders.findById(id).orElseThrow();
+        assertThat(saved.status()).isEqualTo(OrderStatus.PAID);
+        assertThat(saved.total()).isEqualTo(Money.of("3000.00", "ARS"));
+        assertThat(published).singleElement()
+                .extracting(OrderPlaced::orderId).isEqualTo(id);
+    }
+
+    @Test
+    void rejected_payment_publishes_nothing() {
+        var service = serviceWith((orderId, amount, token) ->
+                PaymentResult.rejected("cc_rejected_insufficient_amount"));
+
+        assertThatThrownBy(() -> service.place(command(1)))
+                .isInstanceOf(PaymentRejectedException.class);
+        assertThat(published).isEmpty();
+    }
+
+    private PlaceOrderCommand command(int quantity) {
+        return new PlaceOrderCommand(
+                new CustomerId("cust-42"),
+                List.of(new PlaceOrderCommand.Item(new ProductId(UUID.randomUUID()), quantity)),
+                "tok_visa_4242");
+    }
+}
+</script>
+<script type="text/plain" data-file="InMemoryOrderRepository.java">
+/** Fake del puerto de salida: misma interfaz, cero infraestructura. */
+class InMemoryOrderRepository implements OrderRepository {
+
+    private final Map<OrderId, Order> store = new HashMap<>();
+
+    @Override
+    public void save(Order order) {
+        store.put(order.id(), order);
+    }
+
+    @Override
+    public Optional<Order> findById(OrderId id) {
+        return Optional.ofNullable(store.get(id));
+    }
+
+    @Override
+    public List<Order> findPendingPaymentPlacedBefore(Instant limit) {
+        return store.values().stream()
+                .filter(o -> o.status() == OrderStatus.PENDING_PAYMENT)
+                .filter(o -> o.placedAt().isBefore(limit))
+                .toList();
+    }
+}
+</script>
+<script type="text/plain" data-file="OrderControllerTest.java">
+/** Levanta solo la capa web. Los puertos de entrada son mocks: la aplicación no corre. */
+@WebMvcTest(OrderController.class)
+class OrderControllerTest {
+
+    @Autowired MockMvc mvc;
+
+    @MockitoBean PlaceOrderUseCase placeOrder;   // Spring Boot 3.4+ (antes: @MockBean)
+    @MockitoBean GetOrderQuery getOrder;
+
+    @Test
+    void creates_the_order_and_returns_201_with_location() throws Exception {
+        var id = OrderId.generate();
+        when(placeOrder.place(any())).thenReturn(id);
+
+        mvc.perform(post("/api/orders")
+                        .with(jwt().jwt(token -> token.subject("cust-42")))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"items":[{"productId":"3f1c2a9e-7b1d-4c55-9a43-0e6d2f1b8c10","quantity":2}],
+                                 "paymentToken":"tok_visa_4242"}
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", endsWith(id.value().toString())));
+
+        verify(placeOrder).place(argThat(cmd -> cmd.customerId().value().equals("cust-42")));
+    }
+
+    @Test
+    void rejects_an_empty_order_with_400_without_calling_the_use_case() throws Exception {
+        mvc.perform(post("/api/orders")
+                        .with(jwt()).with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"items":[],"paymentToken":"tok"}
+                                """))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(placeOrder);
+    }
+}
+</script>
+<script type="text/plain" data-file="OrderPersistenceAdapterTest.java">
+/** PostgreSQL real en Docker. Prueba lo que un fake no puede: el mapeo y el SQL. */
+@DataJpaTest
+@Testcontainers
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({OrderPersistenceAdapter.class, OrderJpaMapper.class})
+class OrderPersistenceAdapterTest {
+
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+
+    @Autowired OrderPersistenceAdapter adapter;
+
+    @Test
+    void saves_and_restores_a_paid_order() {
+        Order order = Order.place(new CustomerId("cust-42"),
+                List.of(new OrderLine(new ProductId(UUID.randomUUID()), 2, Money.of("1500.00", "ARS"))),
+                Instant.parse("2026-03-02T15:00:00Z"));
+        order.markAsPaid(new PaymentId("pay_1"));
+
+        adapter.save(order);
+        Order loaded = adapter.findById(order.id()).orElseThrow();
+
+        assertThat(loaded.status()).isEqualTo(OrderStatus.PAID);
+        assertThat(loaded.total()).isEqualTo(Money.of("3000.00", "ARS"));
+        assertThat(loaded.paymentId()).contains(new PaymentId("pay_1"));
+    }
+}
+</script>
+<script type="text/plain" data-file="PaymentApiAdapterTest.java">
+/** Un servidor HTTP falso de verdad: se prueban timeouts y errores sin pegarle al proveedor. */
+@WireMockTest
+class PaymentApiAdapterTest {
+
+    PaymentApiAdapter adapter;
+
+    @BeforeEach
+    void setUp(WireMockRuntimeInfo wiremock) {
+        var props = new PaymentApiProperties(URI.create(wiremock.getHttpBaseUrl()), "test-key",
+                                             Duration.ofSeconds(1), Duration.ofMillis(500));
+        adapter = new PaymentApiAdapter(RestClient.builder(), props);
+    }
+
+    @Test
+    void an_approved_charge_becomes_an_approved_result() {
+        stubFor(post("/v1/charges")
+                .withHeader("Idempotency-Key", matching(".+"))
+                .willReturn(okJson("""
+                        {"id":"pay_123","status":"approved","status_detail":"accredited"}
+                        """)));
+
+        PaymentResult result = adapter.charge(OrderId.generate(), Money.of("3000", "ARS"), "tok_visa");
+
+        assertThat(result.status()).isEqualTo(PaymentGateway.Status.APPROVED);
+        assertThat(result.paymentId()).isEqualTo(new PaymentId("pay_123"));
+    }
+
+    @Test
+    void a_slow_provider_becomes_payment_unavailable() {
+        stubFor(post("/v1/charges").willReturn(okJson("{}").withFixedDelay(2_000)));
+
+        assertThatThrownBy(() -> adapter.charge(OrderId.generate(), Money.of("10", "ARS"), "tok"))
+                .isInstanceOf(PaymentUnavailableException.class);
+    }
+}
+</script>
+<script type="text/plain" data-file="HexagonalArchitectureTest.java">
+/** La regla de dependencias, convertida en un test que falla en el CI. */
+@AnalyzeClasses(packages = "com.shop.orders", importOptions = ImportOption.DoNotIncludeTests.class)
+class HexagonalArchitectureTest {
+
+    @ArchTest
+    static final ArchRule domain_depends_on_nothing = noClasses()
+            .that().resideInAPackage("..domain..")
+            .should().dependOnClassesThat().resideInAnyPackage(
+                    "org.springframework..", "jakarta..", "com.fasterxml..",
+                    "..application..", "..adapter..");
+
+    @ArchTest
+    static final ArchRule application_does_not_know_adapters = noClasses()
+            .that().resideInAPackage("..application..")
+            .should().dependOnClassesThat().resideInAPackage("..adapter..");
+
+    @ArchTest
+    static final ArchRule adapters_do_not_know_each_other = slices()
+            .matching("com.shop.orders.adapter.(*).(*)..")
+            .should().notDependOnEachOther();
+}
+</script>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CUÁNDO ================= -->
+  <section class="band" id="cuando" aria-labelledby="h-cuando">
+    <header>
+      <h2 id="h-cuando"><span class="num">Criterio</span>¿Cuándo conviene?</h2>
+      <p>No es gratis. Por cada concepto del negocio aparecen tres o cuatro clases y un mapper. Se paga sola cuando el negocio tiene reglas de verdad y el sistema va a vivir varios años; en un CRUD es pura ceremonia.</p>
+    </header>
+    <div class="two">
+      <div class="col yes">
+        <h3>Conviene cuando</h3>
+        <ul>
+          <li>Hay reglas de negocio con estados, límites y excepciones (pedidos, pagos, turnos, préstamos).</li>
+          <li>El servicio va a durar años y las integraciones van a cambiar en ese tiempo.</li>
+          <li>Hay varios canales de entrada: REST, mensajería, jobs, CLI de backoffice.</li>
+          <li>Querés una suite de tests rápida que no dependa de Docker para cada cambio.</li>
+        </ul>
+      </div>
+      <div class="col no">
+        <h3>Probablemente no, cuando</h3>
+        <ul>
+          <li>Es un CRUD que pasa datos de un formulario a una tabla sin reglas en el medio.</li>
+          <li>Es un prototipo o un script que se va a tirar.</li>
+          <li>El equipo no la conoce y no hay tiempo para acordar convenciones: a medias es peor que nada.</li>
+        </ul>
+      </div>
+      <div class="col cost">
+        <h3>Lo que cuesta</h3>
+        <ul>
+          <li>Más clases y mapeos entre dominio, DTOs y entidades.</li>
+          <li>Más indirección para navegar el código: el puerto en un paquete, la implementación en otro.</li>
+          <li>Disciplina: un solo import mal puesto rompe la regla. Por eso el test de ArchUnit.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NOMBRES ================= -->
+  <section class="band" id="nombres" aria-labelledby="h-nombres">
+    <header>
+      <h2 id="h-nombres"><span class="num">Vocabulario</span>Mismo dibujo, otros nombres</h2>
+      <p>Hexagonal, Onion y Clean Architecture comparten la idea central (el negocio en el centro, las dependencias hacia adentro) y cambian sobre todo los nombres y cuántos anillos dibujan.</p>
+    </header>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">En esta página</th><th scope="col">Cockburn (Ports &amp; Adapters)</th><th scope="col">Clean Architecture</th><th scope="col">Onion Architecture</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="sw" style="background:var(--domain)"></span>Dominio</th><td>parte de «la aplicación»</td><td>Entities</td><td>Domain Model</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--app)"></span>Aplicación</th><td>la aplicación</td><td>Use Cases (Interactors)</td><td>Application Services</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--port)"></span>Puerto de entrada</th><td>puerto primario (driving)</td><td>Input Boundary</td><td>interfaz de servicio de aplicación</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--port)"></span>Puerto de salida</th><td>puerto secundario (driven)</td><td>Output Boundary / Gateway</td><td>interfaz de repositorio o servicio</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</th><td>adaptador primario</td><td>Controllers</td><td>UI</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>Adaptador de salida</th><td>adaptador secundario</td><td>Gateways (implementación)</td><td>Infrastructure</td></tr>
+          <tr><th scope="row"><span class="sw" style="background:var(--cfg)"></span>Configuración</th><td>configurador</td><td>Main</td><td>raíz de composición</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="sources">
+    <h2>Para seguir leyendo</h2>
+    <ul>
+      <li>Alistair Cockburn, <a href="https://alistair.cockburn.us/hexagonal-architecture/" target="_blank" rel="noopener">Hexagonal Architecture</a> (2005): el artículo original.</li>
+      <li>Tom Hombergs, <em>Get Your Hands Dirty on Clean Architecture</em> (2.ª ed., 2023): la estructura de paquetes <code>port.in</code> / <code>port.out</code> de esta página.</li>
+      <li>Spring Framework, <a href="https://docs.spring.io/spring-framework/reference/integration/rest-clients.html" target="_blank" rel="noopener">REST Clients</a>: <code>RestClient</code> y <code>@HttpExchange</code>.</li>
+      <li>Spring Boot, <a href="https://docs.spring.io/spring-boot/reference/testing/testcontainers.html" target="_blank" rel="noopener">Testcontainers</a> y <code>@ServiceConnection</code>.</li>
+      <li><a href="https://www.archunit.org/userguide/html/000_Index.html" target="_blank" rel="noopener">ArchUnit User Guide</a>: reglas de capas y de slices.</li>
+    </ul>
+  </footer>
+
+  <dialog class="dlg" id="layer-dialog" aria-labelledby="dlg-name">
+    <div class="dlg-bar">
+      <svg class="dlg-sw" viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg>
+      <span class="dlg-name" id="dlg-name">Dominio</span>
+      <span class="dlg-pos" id="dlg-pos">1 / 7</span>
+      <span class="dlg-spacer"></span>
+      <button type="button" class="dlg-btn" id="dlg-prev" aria-label="Capa anterior">←</button>
+      <button type="button" class="dlg-btn" id="dlg-next" aria-label="Capa siguiente">→</button>
+      <button type="button" class="dlg-btn dlg-close" id="dlg-close" autofocus>Cerrar <span aria-hidden="true">×</span></button>
+    </div>
+    <div class="dlg-body">
       <!-- ================= DOMINIO ================= -->
       <article class="sheet" data-layer="dominio" id="ficha-dominio" aria-labelledby="h-dominio">
         <p class="eyebrow"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg>Centro del hexágono</p>
@@ -1859,540 +2460,8 @@ payments:
         <div class="trap"><b>Error típico</b><p>Mezclar las dos variantes: servicios con <code>@Service</code> que además se declaran en un <code>@Bean</code>. Quedan dos beans del mismo tipo y el arranque falla con <code>NoUniqueBeanDefinitionException</code> en el primer controller que pide el puerto. Elegí una variante y usala en todo el proyecto.</p></div>
       </article>
 
-      <!-- ================= RECORRIDO ================= -->
-      <article class="sheet flow" id="ficha-recorrido" aria-labelledby="h-flow" hidden>
-        <p class="eyebrow"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 0 9.33 2.5 9.33 7.5 5 10 .67 7.5 .67 2.5Z"/></svg>Recorrido</p>
-        <h2 id="h-flow">Un POST /api/orders, de punta a punta</h2>
-        <p class="lead">Seguí el punto en el diagrama. Fijate cuántas veces la petición entra al dominio y cuántas sale por un puerto: el núcleo nunca llama directo a la base ni a una API.</p>
-
-        <ol class="flow-steps">
-          <li class="step" data-via="" data-x="24" data-y="232" data-targets="a-rest">
-            <button type="button"><span class="n">01</span><span>El cliente envía el pedido<span class="where">Afuera del hexágono</span></span></button>
-            <div class="detail"><p><code>POST /api/orders</code> con un JWT en el header y <code>{"items":[{"productId":"…","quantity":2}],"paymentToken":"tok_…"}</code>.</p></div>
-          </li>
-          <li class="step" data-via="" data-x="128" data-y="258" data-targets="a-rest">
-            <button type="button"><span class="n">02</span><span>OrderController traduce HTTP a negocio<span class="where">Adaptador de entrada</span></span></button>
-            <div class="detail"><p>Spring deserializa el JSON en <code>PlaceOrderRequest</code> y <code>@Valid</code> corta los errores de formato con 400. El id del cliente sale del token. Resultado: un <code>PlaceOrderCommand</code>.</p></div>
-          </li>
-          <li class="step" data-via="216,228" data-x="266" data-y="228" data-targets="a-rest p-place">
-            <button type="button"><span class="n">03</span><span>Cruza el puerto de entrada<span class="where">PlaceOrderUseCase</span></span></button>
-            <div class="detail"><p>El controller llama a <code>placeOrder.place(command)</code>. Solo conoce la interfaz: no sabe qué clase la implementa ni que hay una transacción alrededor.</p></div>
-          </li>
-          <li class="step" data-via="330,228 420,175" data-x="500" data-y="174" data-targets="app">
-            <button type="button"><span class="n">04</span><span>PlaceOrderService toma el control<span class="where">Aplicación</span></span></button>
-            <div class="detail"><p>La lambda de <code>BeanConfiguration</code> abre la transacción y delega en el servicio, que ejecuta el caso de uso paso a paso.</p></div>
-          </li>
-          <li class="step" data-via="640,170 700,250 733,292" data-x="764" data-y="292" data-targets="app p-catalog a-db">
-            <button type="button"><span class="n">05</span><span>Busca precios en la base<span class="where">ProductCatalog → JdbcClient</span></span></button>
-            <div class="detail"><p><code>catalog.priceOf(id)</code> sale por el puerto y llega a <code>ProductCatalogAdapter</code>, que ejecuta <code>select price, currency from products …</code>. El precio nunca viene del cliente.</p></div>
-          </li>
-          <li class="step" data-via="620,310" data-x="500" data-y="322" data-targets="dom">
-            <button type="button"><span class="n">06</span><span>El dominio crea el pedido<span class="where">Order.place(…)</span></span></button>
-            <div class="detail"><p>Valida las invariantes (al menos una línea, una sola moneda) y calcula el total con <code>Money</code>. Si algo no cumple, lanza una excepción de negocio que termina en un 422.</p></div>
-          </li>
-          <li class="step" data-via="620,340 733,356" data-x="764" data-y="356" data-targets="app p-pay a-pay">
-            <button type="button"><span class="n">07</span><span>Cobra en la API externa<span class="where">PaymentGateway → RestClient</span></span></button>
-            <div class="detail"><p><code>PaymentApiAdapter</code> hace <code>POST /v1/charges</code> con <code>Idempotency-Key</code> igual al id del pedido y timeouts de 2 y 5 segundos. La respuesta del proveedor vuelve como <code>PaymentResult</code>.</p></div>
-          </li>
-          <li class="step" data-via="733,356 620,340" data-x="500" data-y="322" data-targets="dom">
-            <button type="button"><span class="n">08</span><span>El pedido pasa a pagado<span class="where">order.markAsPaid(…)</span></span></button>
-            <div class="detail"><p>El agregado verifica que estaba en <code>PENDING_PAYMENT</code> y pasa a <code>PAID</code>. Si el pago quedó pendiente, el pedido sigue así y lo resuelve el job de vencidos.</p></div>
-          </li>
-          <li class="step" data-via="600,270 733,228" data-x="764" data-y="228" data-targets="app p-repo a-db">
-            <button type="button"><span class="n">09</span><span>Se guarda en PostgreSQL<span class="where">OrderRepository → Spring Data JPA</span></span></button>
-            <div class="detail"><p><code>OrderPersistenceAdapter</code> mapea a <code>OrderJpaEntity</code> y Spring Data hace los <code>INSERT</code> en <code>orders</code> y <code>order_lines</code>. El commit llega al terminar el caso de uso.</p></div>
-          </li>
-          <li class="step" data-via="733,228 660,320 733,420" data-x="764" data-y="420" data-targets="app p-events a-kafka-out">
-            <button type="button"><span class="n">10</span><span>Se publica el evento<span class="where">OrderEventPublisher → Kafka</span></span></button>
-            <div class="detail"><p><code>KafkaOrderPublisher</code> envía el mensaje a <code>orders.order-placed.v1</code> con el id del pedido como clave. Logística, mails y analytics se enteran sin que este servicio los conozca.</p></div>
-          </li>
-          <li class="step" data-via="733,420 600,480 400,480 300,330 266,228 216,228 128,258" data-x="24" data-y="232" data-targets="a-rest">
-            <button type="button"><span class="n">11</span><span>Respuesta 201 Created<span class="where">De vuelta por el adaptador de entrada</span></span></button>
-            <div class="detail"><p>El caso de uso devuelve el <code>OrderId</code> y el controller arma <code>Location: /api/orders/{id}</code>. Si el pago se rechazó, <code>ApiExceptionHandler</code> responde 402 con un <code>ProblemDetail</code>.</p></div>
-          </li>
-        </ol>
-
-        <div class="flow-nav">
-          <button type="button" class="btn" id="flow-play" aria-pressed="false">Reproducir</button>
-          <button type="button" class="btn" id="flow-prev">Anterior</button>
-          <button type="button" class="btn primary" id="flow-next">Siguiente paso</button>
-          <output id="flow-count" aria-live="polite">Paso 1 de 11</output>
-        </div>
-      </article>
     </div>
-  </section>
-
-  <!-- ================= REGLA DE DEPENDENCIAS ================= -->
-  <section class="band" id="paquetes" aria-labelledby="h-paquetes">
-    <header>
-      <h2 id="h-paquetes"><span class="num">La regla</span>Todas las dependencias apuntan hacia adentro</h2>
-      <p>Se verifica mirando los imports. Un archivo del dominio no importa nada de afuera; un adaptador puede importar puertos y dominio, pero nunca otro adaptador. La estructura de paquetes hace visible la regla, y un test de ArchUnit (en la sección de tests) la hace obligatoria.</p>
-    </header>
-    <div class="split">
-      <pre class="tree" aria-label="Estructura de paquetes del proyecto"><b class="k">com.shop.orders</b>
-├── <b class="d">domain</b>                      <span class="d">Java puro, sin imports de frameworks</span>
-│   ├── model                   Order, OrderLine, Money, OrderId, OrderStatus
-│   ├── event                   OrderPlaced
-│   └── exception               InvalidOrderStateException, EmptyOrderException, …
-├── <b class="a">application</b>
-│   ├── <b class="p">port</b>
-│   │   ├── <b class="p">in</b>                  PlaceOrderUseCase, GetOrderQuery, MarkShippedUseCase, …
-│   │   └── <b class="p">out</b>                 OrderRepository, ProductCatalog, PaymentGateway, …
-│   └── service                 PlaceOrderService, GetOrderService, …
-├── <b class="i">adapter</b>
-│   ├── <b class="i">in</b>
-│   │   ├── web                 OrderController, PlaceOrderRequest, ApiExceptionHandler
-│   │   ├── messaging           ShipmentListener
-│   │   └── scheduling          ExpiredOrdersJob
-│   └── <b class="o">out</b>
-│       ├── persistence         OrderPersistenceAdapter, OrderJpaEntity, ProductCatalogAdapter
-│       ├── payment             PaymentApiAdapter, PaymentApiProperties
-│       └── messaging           KafkaOrderPublisher
-├── <b class="c">config</b>                      BeanConfiguration, KafkaConfig
-└── OrdersApplication.java</pre>
-
-      <div>
-        <div class="table-wrap">
-          <table class="matrix">
-            <caption class="small" style="caption-side:bottom; text-align:left; padding:.6rem .8rem">Fila = quién importa. Columna = a quién.</caption>
-            <thead><tr><th scope="col">Paquete</th><th scope="col">domain</th><th scope="col">application</th><th scope="col">adapter</th><th scope="col">Spring y librerías</th></tr></thead>
-            <tbody>
-              <tr><td><span class="sw" style="background:var(--domain)"></span>domain</td><td class="y">sí</td><td class="n">no</td><td class="n">no</td><td class="n">no</td></tr>
-              <tr><td><span class="sw" style="background:var(--app)"></span>application</td><td class="y">sí</td><td class="y">sí</td><td class="n">no</td><td class="m">opcional*</td></tr>
-              <tr><td><span class="sw" style="background:var(--in)"></span>adapter</td><td class="y">sí</td><td class="m">solo puertos</td><td class="n">no entre sí</td><td class="y">sí</td></tr>
-              <tr><td><span class="sw" style="background:var(--cfg)"></span>config</td><td class="y">sí</td><td class="y">sí</td><td class="y">sí</td><td class="y">sí</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="small">* <code>@Service</code> y <code>@Transactional</code> en la variante pragmática. En la estricta, la aplicación tampoco importa Spring.</p>
-        <p class="small">Una alternativa común es poner los puertos de salida dentro de <code>domain</code> (por ejemplo, <code>domain.repository</code>). Funciona igual: lo que no se negocia es la dirección de las flechas.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= SPRING POR CAPA ================= -->
-  <section class="band" id="spring" aria-labelledby="h-spring">
-    <header>
-      <h2 id="h-spring"><span class="num">Mapa</span>Spring, capa por capa</h2>
-      <p>Una forma rápida de revisar un proyecto: buscá cada anotación y fijate en qué paquete está. Si una de la columna «adaptador» aparece en <code>domain</code>, ahí hay una dependencia que apunta para el lado equivocado.</p>
-    </header>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">Componente</th><th scope="col">Capa</th><th scope="col">Para qué se usa acá</th></tr></thead>
-        <tbody>
-          <tr><th scope="row"><code>@RestController</code>, <code>@Valid</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Exponer casos de uso por HTTP y validar el formato del JSON.</td></tr>
-          <tr><th scope="row"><code>@RestControllerAdvice</code>, <code>ProblemDetail</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Traducir excepciones de negocio a códigos HTTP.</td></tr>
-          <tr><th scope="row"><code>@KafkaListener</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cuando llega un mensaje.</td></tr>
-          <tr><th scope="row"><code>@Scheduled</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cada cierto tiempo.</td></tr>
-          <tr><th scope="row"><code>@Component</code></th><td><span class="sw" style="background:var(--in)"></span><span class="sw" style="background:var(--out)"></span>Adaptadores (los dos lados)</td><td>Registrar como bean listeners, jobs, clientes HTTP, publishers y mappers.</td></tr>
-          <tr><th scope="row"><code>@Service</code>, <code>@Transactional</code></th><td><span class="sw" style="background:var(--app)"></span>Aplicación (opcional)</td><td>Registrar el servicio y marcar el límite de la transacción.</td></tr>
-          <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--port)"></span>Puertos</td><td>Interfaces Java planas.</td></tr>
-          <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--domain)"></span>Dominio</td><td>Java puro.</td></tr>
-          <tr><th scope="row"><code>@Entity</code>, <code>JpaRepository</code>, <code>@Repository</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Persistir en una base relacional.</td></tr>
-          <tr><th scope="row"><code>JdbcClient</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Consultas SQL explícitas.</td></tr>
-          <tr><th scope="row"><code>RestClient</code>, <code>@HttpExchange</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Llamar a APIs de otros sistemas.</td></tr>
-          <tr><th scope="row"><code>KafkaTemplate</code></th><td><span class="sw" style="background:var(--out)"></span>Adaptador de salida</td><td>Publicar eventos.</td></tr>
-          <tr><th scope="row"><code>@Configuration</code>, <code>@Bean</code>, <code>@Profile</code></th><td><span class="sw" style="background:var(--cfg)"></span>Configuración</td><td>Conectar puertos con sus implementaciones.</td></tr>
-          <tr><th scope="row"><code>@ConfigurationProperties</code></th><td><span class="sw" style="background:var(--cfg)"></span>Config. / adaptadores</td><td>Valores por ambiente, tipados.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="split stereo" id="component">
-      <div>
-        <h3>¿Y @Component?</h3>
-        <p><code>@Component</code> es el estereotipo genérico: le dice al component scan «registrá esta clase como bean». <code>@Service</code>, <code>@Repository</code> y <code>@Controller</code> son <code>@Component</code> con otro nombre (están meta-anotadas con él), así que se detectan igual. Solo dos agregan comportamiento:</p>
-        <ul>
-          <li><code>@Repository</code> traduce las excepciones de la base a <code>DataAccessException</code>.</li>
-          <li><code>@Controller</code> y <code>@RestController</code> son los que Spring MVC registra como handlers HTTP.</li>
-          <li><code>@Service</code> no agrega nada: solo comunica «acá hay lógica de aplicación».</li>
-          <li><code>@Component</code> cubre todo lo demás.</li>
-        </ul>
-        <p>En hexagonal, <code>@Component</code> va en los adaptadores que no son ni controllers ni repositorios. En esta página son <code>ShipmentListener</code>, <code>ExpiredOrdersJob</code>, <code>PaymentApiAdapter</code>, <code>KafkaOrderPublisher</code>, <code>ProductCatalogAdapter</code> y <code>OrderJpaMapper</code>. Ponerles <code>@Service</code> confundiría, porque no tienen lógica de negocio. Nunca va en el dominio, y tampoco en un puerto: el puerto es una interfaz y lo que se anota es la clase que lo implementa.</p>
-        <p>Algunos equipos crean estereotipos propios meta-anotados con <code>@Component</code>, como <code>@Adapter</code> o <code>@UseCase</code>. El código se lee mejor y ArchUnit puede exigir, por ejemplo, que toda clase de <code>adapter</code> lleve <code>@Adapter</code>. Tené en cuenta dos cosas. La clase sigue dependiendo de Spring, aunque sea a través de tu anotación. Y <code>@UseCase</code> solo sirve en la variante pragmática: en la estricta los servicios ya se declaran en <code>BeanConfiguration</code> y terminarías con dos beans.</p>
-      </div>
-      <div class="codeset">
-<script type="text/plain" data-file="Adapter.java">
-package com.shop.orders.shared;
-
-/** Estereotipo propio: se comporta como @Component y dice qué rol cumple la clase. */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Component
-public @interface Adapter {
-
-    @AliasFor(annotation = Component.class)
-    String value() default "";
-}
-</script>
-<script type="text/plain" data-file="UseCase.java">
-package com.shop.orders.shared;
-
-/** Solo para la variante pragmática (sin BeanConfiguration para los servicios). */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-@Component
-public @interface UseCase {
-
-    @AliasFor(annotation = Component.class)
-    String value() default "";
-}
-</script>
-<script type="text/plain" data-file="Uso">
-@Adapter                       // en lugar de @Component
-class PaymentApiAdapter implements PaymentGateway { ... }
-
-@Adapter
-class KafkaOrderPublisher implements OrderEventPublisher { ... }
-
-@UseCase                       // en lugar de @Service
-@Transactional
-public class PlaceOrderService implements PlaceOrderUseCase { ... }
-
-// Y la regla en ArchUnit:
-@ArchTest
-static final ArchRule adapters_are_marked = classes()
-        .that().resideInAPackage("..adapter..")
-        .and().haveSimpleNameEndingWith("Adapter")
-        .should().beAnnotatedWith(Adapter.class)
-        .orShould().beAnnotatedWith(Repository.class);
-</script>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= TESTS ================= -->
-  <section class="band" id="tests" aria-labelledby="h-tests">
-    <header>
-      <h2 id="h-tests"><span class="num">Tests</span>Cada capa se prueba con lo mínimo que necesita</h2>
-      <p>Este es el beneficio más concreto del día a día. Como el núcleo no depende de nada, la mayoría de los tests corre sin Spring y sin base. Los tests lentos quedan solo en los adaptadores, que es donde de verdad hay infraestructura.</p>
-    </header>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">Qué</th><th scope="col">Qué se prueba</th><th scope="col">Herramienta</th><th scope="col">¿Levanta Spring?</th></tr></thead>
-        <tbody>
-          <tr><th scope="row"><span class="sw" style="background:var(--domain)"></span>Dominio</th><td>Invariantes, cálculos, transiciones de estado</td><td>JUnit 5 + AssertJ</td><td class="y">No</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--app)"></span>Aplicación</th><td>Orquestación y decisiones del caso de uso</td><td>JUnit + fakes en memoria (o Mockito)</td><td class="y">No</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--in)"></span>Adaptador web</th><td>JSON, validación, status, seguridad</td><td><code>@WebMvcTest</code> + MockMvc + <code>@MockitoBean</code></td><td class="m">Solo la capa web</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>Persistencia</th><td>Mapeo, queries, migraciones</td><td><code>@DataJpaTest</code> + Testcontainers</td><td class="m">Solo JPA</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>API externa</th><td>Request, respuestas, errores, timeouts</td><td>WireMock</td><td class="y">No</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--cfg)"></span>Arquitectura</th><td>Que nadie rompa la regla de dependencias</td><td>ArchUnit</td><td class="y">No</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="tests-codes">
-      <div class="codeset">
-<script type="text/plain" data-file="OrderTest.java">
-class OrderTest {
-
-    static final Instant NOW = Instant.parse("2026-03-02T15:00:00Z");
-    static final CustomerId CUSTOMER = new CustomerId("cust-42");
-
-    @Test
-    void total_is_the_sum_of_the_lines() {
-        Order order = Order.place(CUSTOMER, List.of(line("1500.00", 2), line("250.50", 1)), NOW);
-
-        assertThat(order.total()).isEqualTo(Money.of("3250.50", "ARS"));
-    }
-
-    @Test
-    void a_cancelled_order_cannot_be_paid() {
-        Order order = Order.place(CUSTOMER, List.of(line("100", 1)), NOW);
-        order.cancel();
-
-        assertThatThrownBy(() -> order.markAsPaid(new PaymentId("pay_1")))
-                .isInstanceOf(InvalidOrderStateException.class);
-    }
-
-    @Test
-    void an_order_without_lines_is_rejected() {
-        assertThatThrownBy(() -> Order.place(CUSTOMER, List.of(), NOW))
-                .isInstanceOf(EmptyOrderException.class);
-    }
-
-    private static OrderLine line(String price, int quantity) {
-        return new OrderLine(new ProductId(UUID.randomUUID()), quantity, Money.of(price, "ARS"));
-    }
-}
-</script>
-<script type="text/plain" data-file="PlaceOrderServiceTest.java">
-/** Sin Spring y sin Mockito: los puertos se implementan con un HashMap y lambdas. */
-class PlaceOrderServiceTest {
-
-    static final Instant NOW = Instant.parse("2026-03-02T15:00:00Z");
-
-    InMemoryOrderRepository orders = new InMemoryOrderRepository();
-    List<OrderPlaced> published = new ArrayList<>();
-    ProductCatalog catalog = productId -> Money.of("1500.00", "ARS");
-
-    PlaceOrderService serviceWith(PaymentGateway payments) {
-        return new PlaceOrderService(catalog, payments, orders, published::add,
-                                     Clock.fixed(NOW, ZoneOffset.UTC));
-    }
-
-    @Test
-    void approved_payment_leaves_the_order_paid_and_publishes_the_event() {
-        var service = serviceWith((orderId, amount, token) ->
-                PaymentResult.approved(new PaymentId("pay_1")));
-
-        OrderId id = service.place(command(2));
-
-        Order saved = orders.findById(id).orElseThrow();
-        assertThat(saved.status()).isEqualTo(OrderStatus.PAID);
-        assertThat(saved.total()).isEqualTo(Money.of("3000.00", "ARS"));
-        assertThat(published).singleElement()
-                .extracting(OrderPlaced::orderId).isEqualTo(id);
-    }
-
-    @Test
-    void rejected_payment_publishes_nothing() {
-        var service = serviceWith((orderId, amount, token) ->
-                PaymentResult.rejected("cc_rejected_insufficient_amount"));
-
-        assertThatThrownBy(() -> service.place(command(1)))
-                .isInstanceOf(PaymentRejectedException.class);
-        assertThat(published).isEmpty();
-    }
-
-    private PlaceOrderCommand command(int quantity) {
-        return new PlaceOrderCommand(
-                new CustomerId("cust-42"),
-                List.of(new PlaceOrderCommand.Item(new ProductId(UUID.randomUUID()), quantity)),
-                "tok_visa_4242");
-    }
-}
-</script>
-<script type="text/plain" data-file="InMemoryOrderRepository.java">
-/** Fake del puerto de salida: misma interfaz, cero infraestructura. */
-class InMemoryOrderRepository implements OrderRepository {
-
-    private final Map<OrderId, Order> store = new HashMap<>();
-
-    @Override
-    public void save(Order order) {
-        store.put(order.id(), order);
-    }
-
-    @Override
-    public Optional<Order> findById(OrderId id) {
-        return Optional.ofNullable(store.get(id));
-    }
-
-    @Override
-    public List<Order> findPendingPaymentPlacedBefore(Instant limit) {
-        return store.values().stream()
-                .filter(o -> o.status() == OrderStatus.PENDING_PAYMENT)
-                .filter(o -> o.placedAt().isBefore(limit))
-                .toList();
-    }
-}
-</script>
-<script type="text/plain" data-file="OrderControllerTest.java">
-/** Levanta solo la capa web. Los puertos de entrada son mocks: la aplicación no corre. */
-@WebMvcTest(OrderController.class)
-class OrderControllerTest {
-
-    @Autowired MockMvc mvc;
-
-    @MockitoBean PlaceOrderUseCase placeOrder;   // Spring Boot 3.4+ (antes: @MockBean)
-    @MockitoBean GetOrderQuery getOrder;
-
-    @Test
-    void creates_the_order_and_returns_201_with_location() throws Exception {
-        var id = OrderId.generate();
-        when(placeOrder.place(any())).thenReturn(id);
-
-        mvc.perform(post("/api/orders")
-                        .with(jwt().jwt(token -> token.subject("cust-42")))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"items":[{"productId":"3f1c2a9e-7b1d-4c55-9a43-0e6d2f1b8c10","quantity":2}],
-                                 "paymentToken":"tok_visa_4242"}
-                                """))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", endsWith(id.value().toString())));
-
-        verify(placeOrder).place(argThat(cmd -> cmd.customerId().value().equals("cust-42")));
-    }
-
-    @Test
-    void rejects_an_empty_order_with_400_without_calling_the_use_case() throws Exception {
-        mvc.perform(post("/api/orders")
-                        .with(jwt()).with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"items":[],"paymentToken":"tok"}
-                                """))
-                .andExpect(status().isBadRequest());
-
-        verifyNoInteractions(placeOrder);
-    }
-}
-</script>
-<script type="text/plain" data-file="OrderPersistenceAdapterTest.java">
-/** PostgreSQL real en Docker. Prueba lo que un fake no puede: el mapeo y el SQL. */
-@DataJpaTest
-@Testcontainers
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({OrderPersistenceAdapter.class, OrderJpaMapper.class})
-class OrderPersistenceAdapterTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
-
-    @Autowired OrderPersistenceAdapter adapter;
-
-    @Test
-    void saves_and_restores_a_paid_order() {
-        Order order = Order.place(new CustomerId("cust-42"),
-                List.of(new OrderLine(new ProductId(UUID.randomUUID()), 2, Money.of("1500.00", "ARS"))),
-                Instant.parse("2026-03-02T15:00:00Z"));
-        order.markAsPaid(new PaymentId("pay_1"));
-
-        adapter.save(order);
-        Order loaded = adapter.findById(order.id()).orElseThrow();
-
-        assertThat(loaded.status()).isEqualTo(OrderStatus.PAID);
-        assertThat(loaded.total()).isEqualTo(Money.of("3000.00", "ARS"));
-        assertThat(loaded.paymentId()).contains(new PaymentId("pay_1"));
-    }
-}
-</script>
-<script type="text/plain" data-file="PaymentApiAdapterTest.java">
-/** Un servidor HTTP falso de verdad: se prueban timeouts y errores sin pegarle al proveedor. */
-@WireMockTest
-class PaymentApiAdapterTest {
-
-    PaymentApiAdapter adapter;
-
-    @BeforeEach
-    void setUp(WireMockRuntimeInfo wiremock) {
-        var props = new PaymentApiProperties(URI.create(wiremock.getHttpBaseUrl()), "test-key",
-                                             Duration.ofSeconds(1), Duration.ofMillis(500));
-        adapter = new PaymentApiAdapter(RestClient.builder(), props);
-    }
-
-    @Test
-    void an_approved_charge_becomes_an_approved_result() {
-        stubFor(post("/v1/charges")
-                .withHeader("Idempotency-Key", matching(".+"))
-                .willReturn(okJson("""
-                        {"id":"pay_123","status":"approved","status_detail":"accredited"}
-                        """)));
-
-        PaymentResult result = adapter.charge(OrderId.generate(), Money.of("3000", "ARS"), "tok_visa");
-
-        assertThat(result.status()).isEqualTo(PaymentGateway.Status.APPROVED);
-        assertThat(result.paymentId()).isEqualTo(new PaymentId("pay_123"));
-    }
-
-    @Test
-    void a_slow_provider_becomes_payment_unavailable() {
-        stubFor(post("/v1/charges").willReturn(okJson("{}").withFixedDelay(2_000)));
-
-        assertThatThrownBy(() -> adapter.charge(OrderId.generate(), Money.of("10", "ARS"), "tok"))
-                .isInstanceOf(PaymentUnavailableException.class);
-    }
-}
-</script>
-<script type="text/plain" data-file="HexagonalArchitectureTest.java">
-/** La regla de dependencias, convertida en un test que falla en el CI. */
-@AnalyzeClasses(packages = "com.shop.orders", importOptions = ImportOption.DoNotIncludeTests.class)
-class HexagonalArchitectureTest {
-
-    @ArchTest
-    static final ArchRule domain_depends_on_nothing = noClasses()
-            .that().resideInAPackage("..domain..")
-            .should().dependOnClassesThat().resideInAnyPackage(
-                    "org.springframework..", "jakarta..", "com.fasterxml..",
-                    "..application..", "..adapter..");
-
-    @ArchTest
-    static final ArchRule application_does_not_know_adapters = noClasses()
-            .that().resideInAPackage("..application..")
-            .should().dependOnClassesThat().resideInAPackage("..adapter..");
-
-    @ArchTest
-    static final ArchRule adapters_do_not_know_each_other = slices()
-            .matching("com.shop.orders.adapter.(*).(*)..")
-            .should().notDependOnEachOther();
-}
-</script>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= CUÁNDO ================= -->
-  <section class="band" id="cuando" aria-labelledby="h-cuando">
-    <header>
-      <h2 id="h-cuando"><span class="num">Criterio</span>¿Cuándo conviene?</h2>
-      <p>No es gratis. Por cada concepto del negocio aparecen tres o cuatro clases y un mapper. Se paga sola cuando el negocio tiene reglas de verdad y el sistema va a vivir varios años; en un CRUD es pura ceremonia.</p>
-    </header>
-    <div class="two">
-      <div class="col yes">
-        <h3>Conviene cuando</h3>
-        <ul>
-          <li>Hay reglas de negocio con estados, límites y excepciones (pedidos, pagos, turnos, préstamos).</li>
-          <li>El servicio va a durar años y las integraciones van a cambiar en ese tiempo.</li>
-          <li>Hay varios canales de entrada: REST, mensajería, jobs, CLI de backoffice.</li>
-          <li>Querés una suite de tests rápida que no dependa de Docker para cada cambio.</li>
-        </ul>
-      </div>
-      <div class="col no">
-        <h3>Probablemente no, cuando</h3>
-        <ul>
-          <li>Es un CRUD que pasa datos de un formulario a una tabla sin reglas en el medio.</li>
-          <li>Es un prototipo o un script que se va a tirar.</li>
-          <li>El equipo no la conoce y no hay tiempo para acordar convenciones: a medias es peor que nada.</li>
-        </ul>
-      </div>
-      <div class="col cost">
-        <h3>Lo que cuesta</h3>
-        <ul>
-          <li>Más clases y mapeos entre dominio, DTOs y entidades.</li>
-          <li>Más indirección para navegar el código: el puerto en un paquete, la implementación en otro.</li>
-          <li>Disciplina: un solo import mal puesto rompe la regla. Por eso el test de ArchUnit.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= NOMBRES ================= -->
-  <section class="band" id="nombres" aria-labelledby="h-nombres">
-    <header>
-      <h2 id="h-nombres"><span class="num">Vocabulario</span>Mismo dibujo, otros nombres</h2>
-      <p>Hexagonal, Onion y Clean Architecture comparten la idea central (el negocio en el centro, las dependencias hacia adentro) y cambian sobre todo los nombres y cuántos anillos dibujan.</p>
-    </header>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th scope="col">En esta página</th><th scope="col">Cockburn (Ports &amp; Adapters)</th><th scope="col">Clean Architecture</th><th scope="col">Onion Architecture</th></tr></thead>
-        <tbody>
-          <tr><th scope="row"><span class="sw" style="background:var(--domain)"></span>Dominio</th><td>parte de «la aplicación»</td><td>Entities</td><td>Domain Model</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--app)"></span>Aplicación</th><td>la aplicación</td><td>Use Cases (Interactors)</td><td>Application Services</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--port)"></span>Puerto de entrada</th><td>puerto primario (driving)</td><td>Input Boundary</td><td>interfaz de servicio de aplicación</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--port)"></span>Puerto de salida</th><td>puerto secundario (driven)</td><td>Output Boundary / Gateway</td><td>interfaz de repositorio o servicio</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</th><td>adaptador primario</td><td>Controllers</td><td>UI</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--out)"></span>Adaptador de salida</th><td>adaptador secundario</td><td>Gateways (implementación)</td><td>Infrastructure</td></tr>
-          <tr><th scope="row"><span class="sw" style="background:var(--cfg)"></span>Configuración</th><td>configurador</td><td>Main</td><td>raíz de composición</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <footer class="sources">
-    <h2>Para seguir leyendo</h2>
-    <ul>
-      <li>Alistair Cockburn, <a href="https://alistair.cockburn.us/hexagonal-architecture/" target="_blank" rel="noopener">Hexagonal Architecture</a> (2005): el artículo original.</li>
-      <li>Tom Hombergs, <em>Get Your Hands Dirty on Clean Architecture</em> (2.ª ed., 2023): la estructura de paquetes <code>port.in</code> / <code>port.out</code> de esta página.</li>
-      <li>Spring Framework, <a href="https://docs.spring.io/spring-framework/reference/integration/rest-clients.html" target="_blank" rel="noopener">REST Clients</a>: <code>RestClient</code> y <code>@HttpExchange</code>.</li>
-      <li>Spring Boot, <a href="https://docs.spring.io/spring-boot/reference/testing/testcontainers.html" target="_blank" rel="noopener">Testcontainers</a> y <code>@ServiceConnection</code>.</li>
-      <li><a href="https://www.archunit.org/userguide/html/000_Index.html" target="_blank" rel="noopener">ArchUnit User Guide</a>: reglas de capas y de slices.</li>
-    </ul>
-  </footer>
+  </dialog>
 </main>
 
 <script>window.Prism = window.Prism || {}; window.Prism.manual = true;</script>
@@ -2409,15 +2478,15 @@ class HexagonalArchitectureTest {
   const flowSheet = document.getElementById('ficha-recorrido');
   const steps = [...flowSheet.querySelectorAll('.step')];
   const chips = [...document.querySelectorAll('[data-pick]')];
-  const modeBtns = [...document.querySelectorAll('[data-mode]')];
-  const arrowBtns = [...document.querySelectorAll('[data-arrows]')];
+  const modeBtns = [...document.querySelectorAll('button[data-mode]')];
+  const arrowBtns = [...document.querySelectorAll('button[data-arrows]')];
   const arrowNote = document.getElementById('arrow-note');
   const token = document.getElementById('token');
   const prevBtn = document.getElementById('flow-prev');
   const nextBtn = document.getElementById('flow-next');
   const count = document.getElementById('flow-count');
   const layers = sheets.map(s => s.dataset.layer);
-  const state = { mode: 'layers', layer: 'dominio', step: 0 };
+  const state = { mode: 'layers', layer: null, step: 0 };
 
   /* ---------- Bloques de código con pestañas ---------- */
   function dedent(text) {
@@ -2546,7 +2615,7 @@ class HexagonalArchitectureTest {
 
     let lit;
     if (state.mode === 'layers') {
-      lit = els.filter(el => el.dataset.layer === state.layer);
+      lit = state.layer ? els.filter(el => el.dataset.layer === state.layer) : null;
       token.classList.add('off');
     } else {
       const targets = steps[state.step].dataset.targets.split(' ');
@@ -2564,11 +2633,11 @@ class HexagonalArchitectureTest {
       updatePlay();
     }
     els.forEach(el => {
-      const on = lit.includes(el);
-      el.classList.toggle('dim', !on);
+      const on = lit ? lit.includes(el) : false;
+      el.classList.toggle('dim', lit ? !on : false);
       el.classList.toggle('on', on);
     });
-    return lit;
+    return lit || [];
   }
 
   /* ---------- Ficha (punto) que recorre el diagrama ---------- */
@@ -2649,38 +2718,110 @@ class HexagonalArchitectureTest {
     updatePlay();
   }
 
-  /* ---------- Cambios de modo ---------- */
-  function pickLayer(layer, file, scroll) {
+  /* ---------- Ventana emergente con la explicación de cada capa ---------- */
+  const dlg = document.getElementById('layer-dialog');
+  const dlgBody = dlg.querySelector('.dlg-body');
+  const dlgName = document.getElementById('dlg-name');
+  const dlgPos = document.getElementById('dlg-pos');
+  const guide = document.getElementById('ficha-guia');
+  const layerNames = {};
+  document.querySelectorAll('.legend [data-pick]').forEach(b => { layerNames[b.dataset.pick] = b.textContent.trim(); });
+
+  function openLayer(layer, file) {
+    const sheet = sheets.find(s => s.dataset.layer === layer);
+    if (!sheet) return;
     stopPlay();
-    const changed = state.mode !== 'layers' || state.layer !== layer;
-    state.mode = 'layers';
-    state.layer = layer;
-    flowSheet.hidden = true;
-    let sheet = null;
-    sheets.forEach(s => {
-      s.hidden = s.dataset.layer !== layer;
-      if (!s.hidden) sheet = s;
-    });
-    let target = sheet;
+    const wasOpen = dlg.open;
+    const changed = !wasOpen || dlg.dataset.layer !== layer;
+    sheets.forEach(s => { s.hidden = s !== sheet; });
+    dlg.dataset.layer = layer;
+    dlgName.textContent = layerNames[layer];
+    dlgPos.textContent = `${layers.indexOf(layer) + 1} / ${layers.length}`;
+
+    let target = null;
     if (file) {
       for (const set of sheet.querySelectorAll('.codeset')) {
         const i = set._panes.findIndex(p => p.file === file);
         if (i >= 0) {
           showTab(set, i);
-          if (set.dataset.sub) target = document.getElementById(set.dataset.sub);
+          target = set.dataset.sub ? document.getElementById(set.dataset.sub) : set;
           break;
         }
       }
     }
-    flash(render());
+
+    if (!wasOpen) {
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
+    }
     if (changed) enterSheet(sheet);
-    if (scroll) bringIntoView(target);
+
+    // Se desplaza dentro de la ventana, nunca la página
+    const top = target
+      ? target.getBoundingClientRect().top - dlgBody.getBoundingClientRect().top + dlgBody.scrollTop - 12
+      : 0;
+    dlgBody.scrollTo({ top, behavior: wasOpen && !changed && !reduceMotion ? 'smooth' : 'auto' });
+
+    if (state.mode === 'layers') {
+      state.layer = layer;
+      flash(render());
+    }
     setHash(layer);
+  }
+
+  function closeLayer() {
+    if (!dlg.open) return;
+    if (typeof dlg.close === 'function') dlg.close();
+    else { dlg.removeAttribute('open'); dlg.dispatchEvent(new Event('close')); }
+  }
+
+  function stepLayer(delta) {
+    const i = layers.indexOf(dlg.dataset.layer);
+    openLayer(layers[(i + delta + layers.length) % layers.length]);
+  }
+
+  dlg.addEventListener('close', () => {
+    if (state.mode === 'layers') {
+      state.layer = null;
+      render();
+    }
+    setHash(state.mode === 'flow' ? 'recorrido' : 'explorar');
+  });
+  dlg.addEventListener('click', e => { if (e.target === dlg) closeLayer(); });
+  dlg.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && typeof dlg.showModal !== 'function') closeLayer();
+  });
+  document.getElementById('dlg-close').addEventListener('click', closeLayer);
+  document.getElementById('dlg-prev').addEventListener('click', () => stepLayer(-1));
+  document.getElementById('dlg-next').addEventListener('click', () => stepLayer(1));
+
+  // Al pasar por una pieza o por la lista, se ilumina su capa en el diagrama
+  function preview(layer) {
+    if (state.mode !== 'layers' || dlg.open) return;
+    if (!layer) { render(); return; }
+    els.forEach(el => {
+      const on = el.dataset.layer === layer;
+      el.classList.toggle('dim', !on);
+      el.classList.toggle('on', on);
+    });
+  }
+
+  /* ---------- Cambios de modo ---------- */
+  function showLayers(scroll) {
+    stopPlay();
+    state.mode = 'layers';
+    state.layer = null;
+    flowSheet.hidden = true;
+    guide.hidden = false;
+    enterSheet(guide);
+    render();
+    if (scroll) bringIntoView(guide);
+    setHash('explorar');
   }
 
   function startFlow(scroll, autoplay) {
     state.mode = 'flow';
-    sheets.forEach(s => { s.hidden = true; });
+    guide.hidden = true;
     flowSheet.hidden = false;
     enterSheet(flowSheet);
     if (tokenAnim) tokenAnim.cancel();
@@ -2733,19 +2874,30 @@ class HexagonalArchitectureTest {
   /* ---------- Eventos ---------- */
   hex.addEventListener('click', e => {
     const hit = e.target.closest('[data-layer]');
-    if (hit) pickLayer(hit.dataset.layer, hit.dataset.file, true);
+    if (hit) openLayer(hit.dataset.layer, hit.dataset.file);
   });
   hex.addEventListener('keydown', e => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const hit = e.target.closest('.hit');
     if (!hit) return;
     e.preventDefault();
-    pickLayer(hit.dataset.layer, hit.dataset.file, true);
+    openLayer(hit.dataset.layer, hit.dataset.file);
   });
-  chips.forEach(c => c.addEventListener('click', () => pickLayer(c.dataset.pick, null, true)));
+  hex.addEventListener('mouseover', e => {
+    const hit = e.target.closest('[data-layer]');
+    preview(hit ? hit.dataset.layer : null);
+  });
+  hex.addEventListener('mouseleave', () => preview(null));
+  chips.forEach(c => {
+    c.addEventListener('click', () => openLayer(c.dataset.pick));
+    c.addEventListener('mouseenter', () => preview(c.dataset.pick));
+    c.addEventListener('focus', () => preview(c.dataset.pick));
+    c.addEventListener('mouseleave', () => preview(null));
+    c.addEventListener('blur', () => preview(null));
+  });
   modeBtns.forEach(b => b.addEventListener('click', () => {
     if (b.dataset.mode === 'flow') startFlow(true, true);
-    else pickLayer(state.layer, null, true);
+    else showLayers(true);
   }));
   steps.forEach((s, i) => s.querySelector('button').addEventListener('click', () => {
     stopPlay();
@@ -2773,10 +2925,10 @@ class HexagonalArchitectureTest {
 
   /* ---------- Arranque ---------- */
   if (reduceMotion) setPaused(true);
+  render();
   const initial = location.hash.slice(1);
   if (initial === 'recorrido') startFlow(false, true);
-  else if (layers.includes(initial)) pickLayer(initial, null, false);
-  else render();
+  else if (layers.includes(initial)) openLayer(initial);
   intro();
 })();
 </script>
