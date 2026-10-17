@@ -286,6 +286,12 @@ td.y{color:var(--good); font-weight:600} td.n{color:var(--bad); font-weight:600}
 .sources{margin-top:4rem; padding-top:1rem; border-top:1px solid var(--line); font-size:.9rem; color:var(--ink-2)}
 .sources h2{font-family:var(--display); font-size:.8rem; letter-spacing:.1em; text-transform:uppercase; margin:0 0 .6rem; color:var(--ink-3)}
 .sources ul{margin:0; padding-left:1.1rem; display:grid; gap:.3rem}
+.stereo{margin-top:2.2rem}
+.stereo h3{font-family:var(--display); font-weight:800; font-size:1.35rem; margin:0 0 .7rem}
+.stereo p{margin:0 0 .8rem; max-width:68ch}
+.stereo ul{margin:0 0 .9rem; padding-left:1.15rem; max-width:68ch}
+.stereo li + li{margin-top:.35rem}
+.stereo .codeset{--anno:var(--cfg-c); align-self:start}
 </style>
 
 <main class="page">
@@ -1096,6 +1102,7 @@ public interface PaymentGateway {
           <div><dt>@Valid + jakarta.validation</dt><dd><code>@NotEmpty</code>, <code>@Min</code>, <code>@Max</code> en el DTO. Spring devuelve 400 antes de tocar la aplicación.</dd></div>
           <div><dt>@AuthenticationPrincipal</dt><dd>Inyecta el <code>Jwt</code> ya validado por Spring Security (resource server).</dd></div>
           <div><dt>@RestControllerAdvice<br>ProblemDetail</dt><dd>Traduce excepciones del dominio y de la aplicación a respuestas con el formato estándar de errores de HTTP (RFC 9457).</dd></div>
+          <div><dt>@Component</dt><dd>Registra como bean los adaptadores que no son controllers: el listener de Kafka y el job programado.</dd></div>
           <div><dt>@KafkaListener</dt><dd>Adaptador de mensajería: consume un tópico y llama a un puerto de entrada.</dd></div>
           <div><dt>@Scheduled</dt><dd>Adaptador de tiempo: el «quien llama» es el reloj. Requiere <code>@EnableScheduling</code>.</dd></div>
         </dl>
@@ -1284,6 +1291,7 @@ class ExpiredOrdersJob {
 
         <h3>Componentes de Spring</h3>
         <dl class="spring">
+          <div><dt>@Component</dt><dd>Registra como bean los adaptadores que no son repositorios (pagos, Kafka, el catálogo con JdbcClient) y las clases de soporte como el mapper.</dd></div>
           <div><dt>@Repository</dt><dd>Marca el adaptador de persistencia y activa la traducción de excepciones de la base a <code>DataAccessException</code>.</dd></div>
           <div><dt>@Entity · @Embeddable</dt><dd>Mapeo JPA. Viven en el adaptador, en clases distintas de las del dominio.</dd></div>
           <div><dt>JpaRepository</dt><dd>Spring Data genera las consultas a partir del nombre del método.</dd></div>
@@ -1935,6 +1943,7 @@ payments:
           <tr><th scope="row"><code>@RestControllerAdvice</code>, <code>ProblemDetail</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Traducir excepciones de negocio a códigos HTTP.</td></tr>
           <tr><th scope="row"><code>@KafkaListener</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cuando llega un mensaje.</td></tr>
           <tr><th scope="row"><code>@Scheduled</code></th><td><span class="sw" style="background:var(--in)"></span>Adaptador de entrada</td><td>Disparar un caso de uso cada cierto tiempo.</td></tr>
+          <tr><th scope="row"><code>@Component</code></th><td><span class="sw" style="background:var(--in)"></span><span class="sw" style="background:var(--out)"></span>Adaptadores (los dos lados)</td><td>Registrar como bean listeners, jobs, clientes HTTP, publishers y mappers.</td></tr>
           <tr><th scope="row"><code>@Service</code>, <code>@Transactional</code></th><td><span class="sw" style="background:var(--app)"></span>Aplicación (opcional)</td><td>Registrar el servicio y marcar el límite de la transacción.</td></tr>
           <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--port)"></span>Puertos</td><td>Interfaces Java planas.</td></tr>
           <tr><th scope="row">ninguno</th><td><span class="sw" style="background:var(--domain)"></span>Dominio</td><td>Java puro.</td></tr>
@@ -1946,6 +1955,69 @@ payments:
           <tr><th scope="row"><code>@ConfigurationProperties</code></th><td><span class="sw" style="background:var(--cfg)"></span>Config. / adaptadores</td><td>Valores por ambiente, tipados.</td></tr>
         </tbody>
       </table>
+    </div>
+    <div class="split stereo" id="component">
+      <div>
+        <h3>¿Y @Component?</h3>
+        <p><code>@Component</code> es el estereotipo genérico: le dice al component scan «registrá esta clase como bean». <code>@Service</code>, <code>@Repository</code> y <code>@Controller</code> son <code>@Component</code> con otro nombre (están meta-anotadas con él), así que se detectan igual. Solo dos agregan comportamiento:</p>
+        <ul>
+          <li><code>@Repository</code> traduce las excepciones de la base a <code>DataAccessException</code>.</li>
+          <li><code>@Controller</code> y <code>@RestController</code> son los que Spring MVC registra como handlers HTTP.</li>
+          <li><code>@Service</code> no agrega nada: solo comunica «acá hay lógica de aplicación».</li>
+          <li><code>@Component</code> cubre todo lo demás.</li>
+        </ul>
+        <p>En hexagonal, <code>@Component</code> va en los adaptadores que no son ni controllers ni repositorios. En esta página son <code>ShipmentListener</code>, <code>ExpiredOrdersJob</code>, <code>PaymentApiAdapter</code>, <code>KafkaOrderPublisher</code>, <code>ProductCatalogAdapter</code> y <code>OrderJpaMapper</code>. Ponerles <code>@Service</code> confundiría, porque no tienen lógica de negocio. Nunca va en el dominio, y tampoco en un puerto: el puerto es una interfaz y lo que se anota es la clase que lo implementa.</p>
+        <p>Algunos equipos crean estereotipos propios meta-anotados con <code>@Component</code>, como <code>@Adapter</code> o <code>@UseCase</code>. El código se lee mejor y ArchUnit puede exigir, por ejemplo, que toda clase de <code>adapter</code> lleve <code>@Adapter</code>. Tené en cuenta dos cosas. La clase sigue dependiendo de Spring, aunque sea a través de tu anotación. Y <code>@UseCase</code> solo sirve en la variante pragmática: en la estricta los servicios ya se declaran en <code>BeanConfiguration</code> y terminarías con dos beans.</p>
+      </div>
+      <div class="codeset">
+<script type="text/plain" data-file="Adapter.java">
+package com.shop.orders.shared;
+
+/** Estereotipo propio: se comporta como @Component y dice qué rol cumple la clase. */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Adapter {
+
+    @AliasFor(annotation = Component.class)
+    String value() default "";
+}
+</script>
+<script type="text/plain" data-file="UseCase.java">
+package com.shop.orders.shared;
+
+/** Solo para la variante pragmática (sin BeanConfiguration para los servicios). */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface UseCase {
+
+    @AliasFor(annotation = Component.class)
+    String value() default "";
+}
+</script>
+<script type="text/plain" data-file="Uso">
+@Adapter                       // en lugar de @Component
+class PaymentApiAdapter implements PaymentGateway { ... }
+
+@Adapter
+class KafkaOrderPublisher implements OrderEventPublisher { ... }
+
+@UseCase                       // en lugar de @Service
+@Transactional
+public class PlaceOrderService implements PlaceOrderUseCase { ... }
+
+// Y la regla en ArchUnit:
+@ArchTest
+static final ArchRule adapters_are_marked = classes()
+        .that().resideInAPackage("..adapter..")
+        .and().haveSimpleNameEndingWith("Adapter")
+        .should().beAnnotatedWith(Adapter.class)
+        .orShould().beAnnotatedWith(Repository.class);
+</script>
+      </div>
     </div>
   </section>
 
