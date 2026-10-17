@@ -151,11 +151,33 @@ p code, li code, dd code, td code, .lead code{background:var(--surface-2); paddi
 #hex[data-arrows="deps"] .dep-hint{opacity:1}
 #hex .dep-hint path{stroke:var(--ink-2); stroke-width:1.4; fill:none; marker-end:url(#ah-ink)}
 #hex .ah-ink path{fill:var(--ink-2)}
-#hex .token{transition:transform .65s cubic-bezier(.65,0,.25,1), opacity .25s ease}
+#hex .token{transition:opacity .25s ease}
 #hex .token.off{opacity:0}
 #hex .tok-dot{fill:var(--ink)}
 #hex .tok-halo{fill:none; stroke:var(--ink); stroke-width:1.5; transform-origin:0 0; animation:halo 1.6s ease-out infinite}
 @keyframes halo{from{transform:scale(.55); opacity:.9} to{transform:scale(1.5); opacity:0}}
+/* Animación: corriente en los conectores, paquetes que cruzan el hexágono, estela del recorrido */
+#hex .current{fill:none; stroke-width:3.4; stroke-linecap:round; stroke-dasharray:.1 11; animation:march .9s linear infinite; pointer-events:none}
+#hex .current.in{stroke:var(--in)}
+#hex .current.out{stroke:var(--out)}
+@keyframes march{to{stroke-dashoffset:-11.1}}
+#hex[data-arrows="deps"] .current.out{animation-direction:reverse}
+#hex .pk{fill:var(--ink)}
+#hex #packets{transition:opacity .3s ease; pointer-events:none}
+#hex[data-mode="flow"] #packets, #hex[data-arrows="deps"] #packets{opacity:0}
+#hex .trail{fill:none; stroke:var(--ink); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1 1; stroke-dashoffset:1; opacity:.75; pointer-events:none}
+#hex.paused, #hex.paused *{animation-play-state:paused !important}
+#hex.paused #packets{visibility:hidden}
+#hex .el.flash .shape{animation:flash .75s ease-out}
+@keyframes flash{0%{stroke-width:9; stroke-opacity:.25} 100%{stroke-width:2.6; stroke-opacity:1}}
+@keyframes itemIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+@keyframes fadeIn{from{opacity:0} to{opacity:1}}
+.sheet.enter > *{animation:itemIn .42s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--i, 0) * 45ms)}
+.flow-steps li.is-current .detail{animation:itemIn .35s ease both}
+pre.code:not([hidden]){animation:fadeIn .25s ease}
+.diagram{position:relative}
+.motion-btn{position:absolute; top:.55rem; right:.55rem; font-family:var(--mono); font-size:.7rem; letter-spacing:.03em; border:1px solid var(--line); background:var(--surface); color:var(--ink-2); padding:.4rem .65rem; border-radius:3px; cursor:pointer}
+.motion-btn:hover{color:var(--ink); border-color:var(--ink-3)}
 
 /* ---------- Ficha de capa ---------- */
 .reader{min-width:0}
@@ -330,6 +352,7 @@ td.y{color:var(--good); font-weight:600} td.n{color:var(--bad); font-weight:600}
       </div>
 
       <figure class="diagram">
+        <button type="button" class="motion-btn" id="motion" aria-pressed="false">Pausar animación</button>
         <svg id="hex" viewBox="0 0 1000 640" role="group" aria-labelledby="hex-title" data-arrows="calls" data-mode="layers">
           <title id="hex-title">Hexágono: dominio en el centro, aplicación alrededor, puertos en los bordes y adaptadores afuera. Cada parte se puede elegir.</title>
           <defs>
@@ -466,6 +489,23 @@ td.y{color:var(--good); font-weight:600} td.n{color:var(--bad); font-weight:600}
             <text class="t-anno t-out" x="872" y="434" text-anchor="middle">KafkaTemplate</text>
             <line class="conn conn-out" x1="746" y1="420" x2="782" y2="420"/>
           </g>
+
+          <!-- Pedidos que cruzan el hexágono: entran por un puerto, pasan por el dominio y salen por otro -->
+          <g id="packets" aria-hidden="true">
+            <circle class="pk" r="4.5" opacity="0">
+              <animateMotion dur="4.8s" begin="1.8s" repeatCount="indefinite" path="M40 228 H262 Q380 200 500 320 Q620 360 738 356 H790"/>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.9;1" dur="4.8s" begin="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="pk" r="4.5" opacity="0">
+              <animateMotion dur="4.8s" begin="3.4s" repeatCount="indefinite" path="M40 356 H262 Q380 360 500 320 Q620 260 738 228 H790"/>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.9;1" dur="4.8s" begin="3.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle class="pk" r="4.5" opacity="0">
+              <animateMotion dur="4.8s" begin="5s" repeatCount="indefinite" path="M40 420 H262 Q380 440 500 320 Q620 400 738 420 H790"/>
+              <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.08;0.9;1" dur="4.8s" begin="5s" repeatCount="indefinite"/>
+            </circle>
+          </g>
+          <g id="trails" aria-hidden="true"></g>
 
           <g id="token" class="token off" aria-hidden="true" style="transform:translate(24px,232px)">
             <circle class="tok-halo" r="14"/>
@@ -1826,53 +1866,54 @@ payments:
         <p class="lead">Seguí el punto en el diagrama. Fijate cuántas veces la petición entra al dominio y cuántas sale por un puerto: el núcleo nunca llama directo a la base ni a una API.</p>
 
         <ol class="flow-steps">
-          <li class="step" data-x="24" data-y="232" data-targets="a-rest">
+          <li class="step" data-via="" data-x="24" data-y="232" data-targets="a-rest">
             <button type="button"><span class="n">01</span><span>El cliente envía el pedido<span class="where">Afuera del hexágono</span></span></button>
             <div class="detail"><p><code>POST /api/orders</code> con un JWT en el header y <code>{"items":[{"productId":"…","quantity":2}],"paymentToken":"tok_…"}</code>.</p></div>
           </li>
-          <li class="step" data-x="128" data-y="258" data-targets="a-rest">
+          <li class="step" data-via="" data-x="128" data-y="258" data-targets="a-rest">
             <button type="button"><span class="n">02</span><span>OrderController traduce HTTP a negocio<span class="where">Adaptador de entrada</span></span></button>
             <div class="detail"><p>Spring deserializa el JSON en <code>PlaceOrderRequest</code> y <code>@Valid</code> corta los errores de formato con 400. El id del cliente sale del token. Resultado: un <code>PlaceOrderCommand</code>.</p></div>
           </li>
-          <li class="step" data-x="266" data-y="228" data-targets="a-rest p-place">
+          <li class="step" data-via="216,228" data-x="266" data-y="228" data-targets="a-rest p-place">
             <button type="button"><span class="n">03</span><span>Cruza el puerto de entrada<span class="where">PlaceOrderUseCase</span></span></button>
             <div class="detail"><p>El controller llama a <code>placeOrder.place(command)</code>. Solo conoce la interfaz: no sabe qué clase la implementa ni que hay una transacción alrededor.</p></div>
           </li>
-          <li class="step" data-x="500" data-y="132" data-targets="app">
+          <li class="step" data-via="330,228 420,175" data-x="500" data-y="174" data-targets="app">
             <button type="button"><span class="n">04</span><span>PlaceOrderService toma el control<span class="where">Aplicación</span></span></button>
             <div class="detail"><p>La lambda de <code>BeanConfiguration</code> abre la transacción y delega en el servicio, que ejecuta el caso de uso paso a paso.</p></div>
           </li>
-          <li class="step" data-x="764" data-y="292" data-targets="app p-catalog a-db">
+          <li class="step" data-via="640,170 700,250 733,292" data-x="764" data-y="292" data-targets="app p-catalog a-db">
             <button type="button"><span class="n">05</span><span>Busca precios en la base<span class="where">ProductCatalog → JdbcClient</span></span></button>
             <div class="detail"><p><code>catalog.priceOf(id)</code> sale por el puerto y llega a <code>ProductCatalogAdapter</code>, que ejecuta <code>select price, currency from products …</code>. El precio nunca viene del cliente.</p></div>
           </li>
-          <li class="step" data-x="500" data-y="322" data-targets="dom">
+          <li class="step" data-via="620,310" data-x="500" data-y="322" data-targets="dom">
             <button type="button"><span class="n">06</span><span>El dominio crea el pedido<span class="where">Order.place(…)</span></span></button>
             <div class="detail"><p>Valida las invariantes (al menos una línea, una sola moneda) y calcula el total con <code>Money</code>. Si algo no cumple, lanza una excepción de negocio que termina en un 422.</p></div>
           </li>
-          <li class="step" data-x="764" data-y="356" data-targets="app p-pay a-pay">
+          <li class="step" data-via="620,340 733,356" data-x="764" data-y="356" data-targets="app p-pay a-pay">
             <button type="button"><span class="n">07</span><span>Cobra en la API externa<span class="where">PaymentGateway → RestClient</span></span></button>
             <div class="detail"><p><code>PaymentApiAdapter</code> hace <code>POST /v1/charges</code> con <code>Idempotency-Key</code> igual al id del pedido y timeouts de 2 y 5 segundos. La respuesta del proveedor vuelve como <code>PaymentResult</code>.</p></div>
           </li>
-          <li class="step" data-x="500" data-y="322" data-targets="dom">
+          <li class="step" data-via="733,356 620,340" data-x="500" data-y="322" data-targets="dom">
             <button type="button"><span class="n">08</span><span>El pedido pasa a pagado<span class="where">order.markAsPaid(…)</span></span></button>
             <div class="detail"><p>El agregado verifica que estaba en <code>PENDING_PAYMENT</code> y pasa a <code>PAID</code>. Si el pago quedó pendiente, el pedido sigue así y lo resuelve el job de vencidos.</p></div>
           </li>
-          <li class="step" data-x="764" data-y="228" data-targets="app p-repo a-db">
+          <li class="step" data-via="600,270 733,228" data-x="764" data-y="228" data-targets="app p-repo a-db">
             <button type="button"><span class="n">09</span><span>Se guarda en PostgreSQL<span class="where">OrderRepository → Spring Data JPA</span></span></button>
             <div class="detail"><p><code>OrderPersistenceAdapter</code> mapea a <code>OrderJpaEntity</code> y Spring Data hace los <code>INSERT</code> en <code>orders</code> y <code>order_lines</code>. El commit llega al terminar el caso de uso.</p></div>
           </li>
-          <li class="step" data-x="764" data-y="420" data-targets="app p-events a-kafka-out">
+          <li class="step" data-via="733,228 660,320 733,420" data-x="764" data-y="420" data-targets="app p-events a-kafka-out">
             <button type="button"><span class="n">10</span><span>Se publica el evento<span class="where">OrderEventPublisher → Kafka</span></span></button>
             <div class="detail"><p><code>KafkaOrderPublisher</code> envía el mensaje a <code>orders.order-placed.v1</code> con el id del pedido como clave. Logística, mails y analytics se enteran sin que este servicio los conozca.</p></div>
           </li>
-          <li class="step" data-x="24" data-y="232" data-targets="a-rest">
+          <li class="step" data-via="733,420 600,480 400,480 300,330 266,228 216,228 128,258" data-x="24" data-y="232" data-targets="a-rest">
             <button type="button"><span class="n">11</span><span>Respuesta 201 Created<span class="where">De vuelta por el adaptador de entrada</span></span></button>
             <div class="detail"><p>El caso de uso devuelve el <code>OrderId</code> y el controller arma <code>Location: /api/orders/{id}</code>. Si el pago se rechazó, <code>ApiExceptionHandler</code> responde 402 con un <code>ProblemDetail</code>.</p></div>
           </li>
         </ol>
 
         <div class="flow-nav">
+          <button type="button" class="btn" id="flow-play" aria-pressed="false">Reproducir</button>
           <button type="button" class="btn" id="flow-prev">Anterior</button>
           <button type="button" class="btn primary" id="flow-next">Siguiente paso</button>
           <output id="flow-count" aria-live="polite">Paso 1 de 11</output>
@@ -2448,6 +2489,17 @@ class HexagonalArchitectureTest {
   }
 
   /* ---------- Estado del diagrama ---------- */
+  const NS = 'http://www.w3.org/2000/svg';
+  const trails = document.getElementById('trails');
+  const playBtn = document.getElementById('flow-play');
+  const motionBtn = document.getElementById('motion');
+  const START = [24, 232];
+  let tokenPos = START.slice();
+  let tokenAnim = null;
+  let playing = false;
+  let playTimer = null;
+  let paused = false;
+
   function setHash(value) {
     try { history.replaceState(null, '', '#' + value); } catch (e) { /* el visor puede no permitirlo */ }
   }
@@ -2458,52 +2510,160 @@ class HexagonalArchitectureTest {
     el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
+  // Cada conector lleva encima una "corriente" de puntos que marcha en la dirección de la flecha
+  hex.querySelectorAll('.conn').forEach(line => {
+    const current = line.cloneNode();
+    current.setAttribute('class', 'current ' + (line.classList.contains('conn-in') ? 'in' : 'out'));
+    line.after(current);
+  });
+
+  // Los hijos de cada ficha entran escalonados
+  [...sheets, flowSheet].forEach(sheet => {
+    [...sheet.children].forEach((child, i) => child.style.setProperty('--i', Math.min(i, 9)));
+  });
+
+  function flash(list) {
+    if (paused) return;
+    list.forEach(el => {
+      el.classList.remove('flash');
+      el.getBoundingClientRect();
+      el.classList.add('flash');
+      setTimeout(() => el.classList.remove('flash'), 800);
+    });
+  }
+
+  function enterSheet(sheet) {
+    if (reduceMotion || paused) return;
+    sheet.classList.remove('enter');
+    void sheet.offsetWidth;
+    sheet.classList.add('enter');
+  }
+
   function render() {
     hex.dataset.mode = state.mode;
     modeBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
     chips.forEach(c => c.setAttribute('aria-pressed', String(state.mode === 'layers' && c.dataset.pick === state.layer)));
 
+    let lit;
     if (state.mode === 'layers') {
-      els.forEach(el => {
-        const on = el.dataset.layer === state.layer;
-        el.classList.toggle('dim', !on);
-        el.classList.toggle('on', on);
-      });
+      lit = els.filter(el => el.dataset.layer === state.layer);
       token.classList.add('off');
-      return;
+    } else {
+      const targets = steps[state.step].dataset.targets.split(' ');
+      lit = els.filter(el => targets.includes(el.id));
+      token.classList.remove('off');
+      steps.forEach((s, i) => {
+        s.classList.toggle('is-current', i === state.step);
+        s.classList.toggle('is-done', i < state.step);
+        s.querySelector('.detail').hidden = i !== state.step;
+        s.querySelector('button').setAttribute('aria-expanded', String(i === state.step));
+      });
+      prevBtn.disabled = state.step === 0;
+      nextBtn.textContent = state.step === steps.length - 1 ? 'Volver a empezar' : 'Siguiente paso';
+      count.textContent = `Paso ${state.step + 1} de ${steps.length}`;
+      updatePlay();
     }
-
-    const li = steps[state.step];
-    const targets = li.dataset.targets.split(' ');
     els.forEach(el => {
-      const on = targets.includes(el.id);
+      const on = lit.includes(el);
       el.classList.toggle('dim', !on);
       el.classList.toggle('on', on);
     });
-    token.classList.remove('off');
-    token.style.transform = `translate(${li.dataset.x}px, ${li.dataset.y}px)`;
-    steps.forEach((s, i) => {
-      s.classList.toggle('is-current', i === state.step);
-      s.classList.toggle('is-done', i < state.step);
-      s.querySelector('.detail').hidden = i !== state.step;
-      s.querySelector('button').setAttribute('aria-expanded', String(i === state.step));
-    });
-    prevBtn.disabled = state.step === 0;
-    nextBtn.textContent = state.step === steps.length - 1 ? 'Volver a empezar' : 'Siguiente paso';
-    count.textContent = `Paso ${state.step + 1} de ${steps.length}`;
+    return lit;
   }
 
+  /* ---------- Ficha (punto) que recorre el diagrama ---------- */
+  const toPoint = text => text.split(',').map(Number);
+
+  function drawTrail(points, duration) {
+    const line = document.createElementNS(NS, 'polyline');
+    line.setAttribute('points', points.map(p => p.join(',')).join(' '));
+    line.setAttribute('pathLength', '1');
+    line.setAttribute('class', 'trail');
+    trails.append(line);
+    line.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
+                 { duration, easing: 'cubic-bezier(.45,0,.3,1)', fill: 'forwards' });
+    line.animate([{ opacity: 0.75 }, { opacity: 0 }], { duration: 900, delay: duration + 900, fill: 'forwards' })
+        .finished.then(() => line.remove()).catch(() => line.remove());
+  }
+
+  function moveToken(to, via) {
+    const points = [tokenPos, ...via, to];
+    tokenPos = to;
+    if (tokenAnim) tokenAnim.cancel();
+    token.style.transform = `translate(${to[0]}px, ${to[1]}px)`;
+    if (paused || !token.animate) return 0;
+    const segments = points.slice(1).map((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]));
+    const total = segments.reduce((a, b) => a + b, 0);
+    if (total < 1) return 0;
+    const duration = Math.min(2100, Math.max(450, total * 2.1));
+    let travelled = 0;
+    const frames = points.map((p, i) => {
+      if (i > 0) travelled += segments[i - 1];
+      return { transform: `translate(${p[0]}px, ${p[1]}px)`, offset: travelled / total };
+    });
+    tokenAnim = token.animate(frames, { duration, easing: 'cubic-bezier(.45,0,.3,1)' });
+    drawTrail(points, duration);
+    return duration;
+  }
+
+  function goStep(i, sequential) {
+    const previous = state.step;
+    state.step = Math.max(0, Math.min(steps.length - 1, i));
+    const li = steps[state.step];
+    const lit = render();
+    const via = sequential && state.step === previous + 1 && li.dataset.via
+      ? li.dataset.via.trim().split(/\s+/).map(toPoint) : [];
+    const duration = moveToken([+li.dataset.x, +li.dataset.y], via);
+    setTimeout(() => flash(lit), duration * 0.85);
+    return duration;
+  }
+
+  /* ---------- Reproducción automática del recorrido ---------- */
+  function updatePlay() {
+    const atEnd = state.step >= steps.length - 1;
+    playBtn.textContent = playing ? 'Pausar recorrido' : (atEnd ? 'Repetir recorrido' : 'Reproducir');
+    playBtn.setAttribute('aria-pressed', String(playing));
+  }
+
+  function queueNext(delay) {
+    clearTimeout(playTimer);
+    playTimer = setTimeout(() => {
+      if (!playing) return;
+      if (state.step >= steps.length - 1) { stopPlay(); return; }
+      const duration = goStep(state.step + 1, true);
+      queueNext(duration + 3000);
+    }, delay);
+  }
+
+  function startPlay() {
+    if (paused) setPaused(false);
+    playing = true;
+    if (state.step >= steps.length - 1) goStep(0);
+    updatePlay();
+    queueNext(1000);
+  }
+
+  function stopPlay() {
+    playing = false;
+    clearTimeout(playTimer);
+    updatePlay();
+  }
+
+  /* ---------- Cambios de modo ---------- */
   function pickLayer(layer, file, scroll) {
+    stopPlay();
+    const changed = state.mode !== 'layers' || state.layer !== layer;
     state.mode = 'layers';
     state.layer = layer;
     flowSheet.hidden = true;
-    let target = null;
+    let sheet = null;
     sheets.forEach(s => {
       s.hidden = s.dataset.layer !== layer;
-      if (!s.hidden) target = s;
+      if (!s.hidden) sheet = s;
     });
+    let target = sheet;
     if (file) {
-      for (const set of target.querySelectorAll('.codeset')) {
+      for (const set of sheet.querySelectorAll('.codeset')) {
         const i = set._panes.findIndex(p => p.file === file);
         if (i >= 0) {
           showTab(set, i);
@@ -2512,23 +2672,62 @@ class HexagonalArchitectureTest {
         }
       }
     }
-    render();
+    flash(render());
+    if (changed) enterSheet(sheet);
     if (scroll) bringIntoView(target);
     setHash(layer);
   }
 
-  function startFlow(scroll) {
+  function startFlow(scroll, autoplay) {
     state.mode = 'flow';
     sheets.forEach(s => { s.hidden = true; });
     flowSheet.hidden = false;
-    render();
+    enterSheet(flowSheet);
+    if (tokenAnim) tokenAnim.cancel();
+    tokenPos = START.slice();
+    state.step = 0;
+    goStep(0);
     if (scroll) bringIntoView(flowSheet);
     setHash('recorrido');
+    if (autoplay && !reduceMotion) startPlay(); else stopPlay();
   }
 
-  function goStep(i) {
-    state.step = Math.max(0, Math.min(steps.length - 1, i));
-    render();
+  /* ---------- Pausa general de la animación ---------- */
+  function setPaused(value) {
+    paused = value;
+    hex.classList.toggle('paused', value);
+    try { if (value) hex.pauseAnimations(); else hex.unpauseAnimations(); } catch (e) { /* sin SMIL */ }
+    motionBtn.setAttribute('aria-pressed', String(value));
+    motionBtn.textContent = value ? 'Reanudar animación' : 'Pausar animación';
+    if (value) stopPlay();
+  }
+
+  /* ---------- Entrada del diagrama: del centro hacia afuera ---------- */
+  function intro() {
+    if (reduceMotion || !hex.animate) return;
+    const ease = 'cubic-bezier(.2,.8,.2,1)';
+    const enter = (id, from, delay, duration = 620) => {
+      const el = document.getElementById(id);
+      const end = getComputedStyle(el).opacity;
+      el.animate([{ opacity: 0, transform: from }, { opacity: end, transform: 'none' }],
+                 { duration, delay, easing: ease, fill: 'backwards' });
+    };
+    ['dom', 'app'].forEach(id => {
+      const g = document.getElementById(id);
+      g.style.transformBox = 'fill-box';
+      g.style.transformOrigin = 'center';
+    });
+    enter('dom', 'scale(.6)', 0, 720);
+    enter('app', 'scale(.86)', 180, 720);
+    ['p-place', 'p-get', 'p-ship', 'p-cancel'].forEach((id, i) => enter(id, 'translateX(-16px)', 520 + i * 70));
+    ['p-repo', 'p-catalog', 'p-pay', 'p-events'].forEach((id, i) => enter(id, 'translateX(16px)', 520 + i * 70));
+    enter('cap-pin', 'none', 600);
+    enter('cap-pout', 'none', 600);
+    ['a-rest', 'a-kafka-in', 'a-job'].forEach((id, i) => enter(id, 'translateX(-36px)', 820 + i * 90));
+    ['a-db', 'a-pay', 'a-kafka-out'].forEach((id, i) => enter(id, 'translateX(36px)', 820 + i * 90));
+    enter('cap-in', 'none', 950);
+    enter('cap-out', 'none', 950);
+    enter('cfg', 'none', 1150, 800);
   }
 
   /* ---------- Eventos ---------- */
@@ -2545,12 +2744,21 @@ class HexagonalArchitectureTest {
   });
   chips.forEach(c => c.addEventListener('click', () => pickLayer(c.dataset.pick, null, true)));
   modeBtns.forEach(b => b.addEventListener('click', () => {
-    if (b.dataset.mode === 'flow') startFlow(true);
+    if (b.dataset.mode === 'flow') startFlow(true, true);
     else pickLayer(state.layer, null, true);
   }));
-  steps.forEach((s, i) => s.querySelector('button').addEventListener('click', () => goStep(i)));
-  prevBtn.addEventListener('click', () => goStep(state.step - 1));
-  nextBtn.addEventListener('click', () => goStep(state.step === steps.length - 1 ? 0 : state.step + 1));
+  steps.forEach((s, i) => s.querySelector('button').addEventListener('click', () => {
+    stopPlay();
+    goStep(i, i === state.step + 1);
+  }));
+  prevBtn.addEventListener('click', () => { stopPlay(); goStep(state.step - 1); });
+  nextBtn.addEventListener('click', () => {
+    stopPlay();
+    if (state.step === steps.length - 1) goStep(0);
+    else goStep(state.step + 1, true);
+  });
+  playBtn.addEventListener('click', () => (playing ? stopPlay() : startPlay()));
+  motionBtn.addEventListener('click', () => setPaused(!paused));
 
   const arrowNotes = {
     calls: '<b>Llamadas en ejecución.</b> El pedido entra por la izquierda; la aplicación sale a buscar lo que necesita por la derecha.',
@@ -2560,13 +2768,16 @@ class HexagonalArchitectureTest {
     hex.dataset.arrows = b.dataset.arrows;
     arrowBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     arrowNote.innerHTML = arrowNotes[b.dataset.arrows];
+    flash([...hex.querySelectorAll('#a-db, #a-pay, #a-kafka-out')]);
   }));
 
   /* ---------- Arranque ---------- */
+  if (reduceMotion) setPaused(true);
   const initial = location.hash.slice(1);
-  if (initial === 'recorrido') startFlow(false);
+  if (initial === 'recorrido') startFlow(false, true);
   else if (layers.includes(initial)) pickLayer(initial, null, false);
   else render();
+  intro();
 })();
 </script>
 
